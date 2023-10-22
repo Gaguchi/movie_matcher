@@ -1,0 +1,26 @@
+body {
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+}
+
+.card {
+    max-height: 900px;
+    overflow: auto;
+    border-radius: 30px;
+    box-shadow: 5px 5px 15px black;
+    border: 0px solid rgb(0 0 0 / 0%);
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.align-items-center {
+    align-items: center;
+}

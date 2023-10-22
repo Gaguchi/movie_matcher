@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Match</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'movie_match/css/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/react-transition-group/dist/react-transition-group.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    {% verbatim %}
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { CSSTransition, TransitionGroup } = ReactTransitionGroup;
+
+        const options = {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMTg3OWI0OTI1MTE2NzBmMDNmNWI1Y2M5ZWI2ZTQzNSIsInN1YiI6IjY1MzAwNDA5OWQ1OTJjMDBhZTlmMjdkMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RYPMM01Ei_X917bnfjd4M353M2nXYsioz1RPhS1Zoxo'
+            }
+        };
+
+        const getRandomPage = () => Math.floor(Math.random() * 25) + 1;
+
+        const MovieInfo = ({ movie }) => {
+            const truncatedOverview = movie && movie.overview && movie.overview.length > 150 
+                ? `${movie.overview.substring(0, 150)}...` 
+                : movie && movie.overview || '';
+            
+            if (movie && movie.backdrop_path) {
+                document.body.style.backgroundImage = `url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${movie.backdrop_path})`;
+            }
+            
+            return (
+                <div className="card" style={{width: '24rem', margin: 'auto'}}>
+                    <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}`} className="card-img-top" alt={movie.title} />
+                    <div className="card-body">
+                        <h5 className="card-title">{movie.title}</h5>
+                        <p className="card-text">{truncatedOverview}</p>
+                        <p>Release Date: {movie.release_date}</p>
+                        <p>Popularity: {movie.popularity}</p>
+                        <p>Vote Average: {movie.vote_average}</p>
+                    </div>
+                </div>
+            );
+        };
+        
+
+        const App = () => {
+            const [movies, setMovies] = useState([]); // Initialize to an empty array
+            const [currentIndex, setCurrentIndex] = useState(0);
+    
+            useEffect(() => {  // Using the useEffect hook to fetch data
+                const randomPage = getRandomPage();
+                fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${randomPage}&sort_by=popularity.desc`, options)
+                    .then(response => response.json())
+                    .then(data => {
+                        setMovies(data.results);  // Updating the state with fetched data
+                    })
+                    .catch(err => {
+                        console.error('Failed to fetch movies:', err);
+                    });
+            }, []);  // Empty dependency array means this effect runs once when the component mounts
+    
+            const onSwipe = () => {
+                setCurrentIndex(prevIndex => prevIndex + 1);
+            };
+
+            return (
+                <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
+                    <TransitionGroup>
+                    {movies.slice(currentIndex, currentIndex + 2).reverse().map((movie, index) => (
+                        <CSSTransition
+                            key={index}
+                            in={true}
+                            timeout={500}
+                            classNames="fade"
+                            appear
+                        >
+                            <div className="card" style={{ position: 'absolute' }}>
+                                <MovieInfo movie={movie} />
+                                <button onClick={onSwipe}>Swipe</button>
+                            </div>
+                        </CSSTransition>
+                    ))}
+                    </TransitionGroup>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+    {% endverbatim %}
+        
+</body>
+</html>
