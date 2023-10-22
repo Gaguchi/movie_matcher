@@ -69,31 +69,45 @@
                     });
             }, []);  // Empty dependency array means this effect runs once when the component mounts
     
+            
+            const [startX, setStartX] = useState(null);
+            const [swiped, setSwiped] = useState(false);
+
             const onSwipe = () => {
-                setCurrentIndex(prevIndex => prevIndex + 1);
+                setSwiped(true);
+                setTimeout(() => {
+                    setSwiped(false);
+                    setCurrentIndex(prevIndex => prevIndex + 1);
+                }, 500);
             };
 
+
+            const handleTouchStart = (e) => {
+                setStartX(e.touches[0].clientX);
+            };
+
+            const handleTouchEnd = (e) => {
+                const endX = e.changedTouches[0].clientX;
+                if (startX > endX + 50) {
+                    onSwipe();
+                }
+            };
+      
             return (
-                <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
-                    <TransitionGroup>
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     {movies.slice(currentIndex, currentIndex + 2).reverse().map((movie, index) => (
-                        <CSSTransition
-                            key={index}
-                            in={true}
-                            timeout={500}
-                            classNames="fade"
-                            appear
+                        <div 
+                            className={`card ${swiped && index === 1 ? 'fade-out-active' : ''}`} 
+                            style={{ position: 'absolute' }}
+                            onTouchStart={handleTouchStart}
+                            onTouchEnd={handleTouchEnd}
                         >
-                            <div className="card" style={{ position: 'absolute' }}>
-                                <MovieInfo movie={movie} />
-                                <button onClick={onSwipe}>Swipe</button>
-                            </div>
-                        </CSSTransition>
+                            <MovieInfo movie={movie} />
+                        </div>
                     ))}
-                    </TransitionGroup>
                 </div>
             );
-        };
+            };
 
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>

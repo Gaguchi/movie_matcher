@@ -24,3 +24,17 @@ body {
 .align-items-center {
     align-items: center;
 }
+
+@keyframes fadeOut {
+    from {
+      
+        transform: translateX(0px);
+    }
+    to {
+        transform: translateX(339px);
+    }
+  }
+  
+  .fade-out-active {
+    animation: fadeOut 500ms forwards;
+  }
