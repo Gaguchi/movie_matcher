@@ -17,7 +17,6 @@
     {% verbatim %}
     <script type="text/babel">
         const { useState, useEffect } = React;
-        const { CSSTransition, TransitionGroup } = ReactTransitionGroup;
 
         const options = {
             method: 'GET',
@@ -29,15 +28,20 @@
 
         const getRandomPage = () => Math.floor(Math.random() * 25) + 1;
 
-        const MovieInfo = ({ movie }) => {
+        const MovieInfo = ({ movie, nextMovie }) => {
+            if (nextMovie && nextMovie.backdrop_path) {
+                const img = new Image();
+                img.src = `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${nextMovie.backdrop_path}`;
+            }
+
             const truncatedOverview = movie && movie.overview && movie.overview.length > 150 
                 ? `${movie.overview.substring(0, 150)}...` 
                 : movie && movie.overview || '';
-            
+        
             if (movie && movie.backdrop_path) {
                 document.body.style.backgroundImage = `url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${movie.backdrop_path})`;
             }
-            
+
             return (
                 <div className="card" style={{width: '24rem', margin: 'auto'}}>
                     <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}`} className="card-img-top" alt={movie.title} />
@@ -51,36 +55,24 @@
                 </div>
             );
         };
-        
 
         const App = () => {
-            const [movies, setMovies] = useState([]); // Initialize to an empty array
+            const [movies, setMovies] = useState([]);
             const [currentIndex, setCurrentIndex] = useState(0);
-    
-            useEffect(() => {  // Using the useEffect hook to fetch data
+            const [startX, setStartX] = useState(null);
+            const [swiped, setSwiped] = useState(false);
+            
+            useEffect(() => {
                 const randomPage = getRandomPage();
                 fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${randomPage}&sort_by=popularity.desc`, options)
                     .then(response => response.json())
                     .then(data => {
-                        setMovies(data.results);  // Updating the state with fetched data
+                        setMovies(data.results);
                     })
                     .catch(err => {
                         console.error('Failed to fetch movies:', err);
                     });
-            }, []);  // Empty dependency array means this effect runs once when the component mounts
-    
-            
-            const [startX, setStartX] = useState(null);
-            const [swiped, setSwiped] = useState(false);
-
-            const onSwipe = () => {
-                setSwiped(true);
-                setTimeout(() => {
-                    setSwiped(false);
-                    setCurrentIndex(prevIndex => prevIndex + 1);
-                }, 500);
-            };
-
+            }, []);
 
             const handleTouchStart = (e) => {
                 setStartX(e.touches[0].clientX);
@@ -89,29 +81,32 @@
             const handleTouchEnd = (e) => {
                 const endX = e.changedTouches[0].clientX;
                 if (startX > endX + 50) {
-                    onSwipe();
+                    setSwiped(true);
+                    setTimeout(() => {
+                        setSwiped(false);
+                        setCurrentIndex(prevIndex => prevIndex + 1);
+                    }, 500);
                 }
             };
-      
+
             return (
                 <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                    {movies.slice(currentIndex, currentIndex + 2).reverse().map((movie, index) => (
+                    {movies.slice(currentIndex, currentIndex + 2).reverse().map((movie, index, arr) => (
                         <div 
-                            className={`card ${swiped && index === 1 ? 'fade-out-active' : ''}`} 
+                            className={`card ${swiped && index === 1 ? 'fade-out-active' : ''}`}
                             style={{ position: 'absolute' }}
                             onTouchStart={handleTouchStart}
                             onTouchEnd={handleTouchEnd}
                         >
-                            <MovieInfo movie={movie} />
+                            <MovieInfo movie={movie} nextMovie={arr[index + 1]} />
                         </div>
                     ))}
                 </div>
             );
-            };
+        };
 
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
     {% endverbatim %}
-        
 </body>
 </html>
