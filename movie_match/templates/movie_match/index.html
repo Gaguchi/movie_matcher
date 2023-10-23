@@ -13,9 +13,19 @@
 </head>
 <body>
     <div id="root"></div>
+    
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof initReactApp === 'function') {
+                initReactApp();
+            }
+        });
+    </script>
 
     {% verbatim %}
     <script type="text/babel">
+        function initReactApp() {
         const { useState, useEffect } = React;
 
         const options = {
@@ -61,42 +71,63 @@
             const [currentIndex, setCurrentIndex] = useState(0);
             const [startX, setStartX] = useState(null);
             const [swiped, setSwiped] = useState(false);
+            const [swipeDirection, setSwipeDirection] = useState(null);
             
-            useEffect(() => {
+            const fetchMovies = () => {
                 const randomPage = getRandomPage();
                 fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${randomPage}&sort_by=popularity.desc`, options)
                     .then(response => response.json())
                     .then(data => {
-                        setMovies(data.results);
+                        setMovies(prevMovies => [...prevMovies, ...data.results]);
                     })
                     .catch(err => {
                         console.error('Failed to fetch movies:', err);
                     });
-            }, []);
-
-            const handleTouchStart = (e) => {
-                setStartX(e.touches[0].clientX);
             };
+        
+            useEffect(() => {
+                fetchMovies();
+            }, []);
+        
 
-            const handleTouchEnd = (e) => {
-                const endX = e.changedTouches[0].clientX;
-                if (startX > endX + 50) {
+            const stopPropagation = (e) => {
+                e.stopPropagation();
+            };
+            
+            const handleStart = (startX) => {
+                setStartX(startX);
+            };
+        
+            const handleEnd = (endX) => {
+                if (startX > endX + 50 || startX + 50 < endX) {
+                    setSwipeDirection(startX > endX + 50 ? 'left' : 'right');
                     setSwiped(true);
                     setTimeout(() => {
                         setSwiped(false);
-                        setCurrentIndex(prevIndex => prevIndex + 1);
+                        setCurrentIndex(prevIndex => {
+                            const newIndex = prevIndex + 1;
+                            if (newIndex > movies.length - 3) {
+                                fetchMovies();
+                            }
+                            return newIndex;
+                        });
                     }, 500);
                 }
             };
-
+        
             return (
-                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div 
+                    className="d-flex justify-content-center align-items-center" 
+                    style={{ height: '100vh' }}
+                    onMouseDown={(e) => handleStart(e.clientX)}
+                    onMouseUp={(e) => handleEnd(e.clientX)}
+                    onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+                    onTouchEnd={(e) => handleEnd(e.changedTouches[0].clientX)}
+                >
                     {movies.slice(currentIndex, currentIndex + 2).reverse().map((movie, index, arr) => (
                         <div 
-                            className={`card ${swiped && index === 1 ? 'fade-out-active' : ''}`}
+                            className={`card ${swiped && index === 1 ? (swipeDirection === 'left' ? 'swiped-left' : 'swiped-right') : ''}`}
                             style={{ position: 'absolute' }}
-                            onTouchStart={handleTouchStart}
-                            onTouchEnd={handleTouchEnd}
                         >
                             <MovieInfo movie={movie} nextMovie={arr[index + 1]} />
                         </div>
@@ -106,6 +137,11 @@
         };
 
         ReactDOM.render(<App />, document.getElementById('root'));
+    }
+
+    if (document.readyState === 'complete' || (document.readyState !== 'loading' && !document.documentElement.doScroll)) {
+        initReactApp();
+    }
     </script>
     {% endverbatim %}
 </body>
