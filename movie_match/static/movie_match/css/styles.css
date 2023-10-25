@@ -1,3 +1,20 @@
+/* Add this to disable text selection */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  /* Add this to disable dragging */
+  * {
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+  
+
 body {
     background-color: rgb(29, 29, 29);
     background-size: cover;
@@ -5,6 +22,7 @@ body {
     height: 100vh;
     backdrop-filter: blur(10px);
     transition: background-image 1s ease-in-out; 
+    overflow: hidden;
 }
 
 .card {
@@ -55,6 +73,11 @@ body {
 
 .swiped-right {
     animation: swipe-right 500ms forwards;
+}
+
+.swiped-left-dynamic,
+.swiped-right-dynamic {
+  animation-timing-function: ease-out;
 }
 
   img.card-img-top {
