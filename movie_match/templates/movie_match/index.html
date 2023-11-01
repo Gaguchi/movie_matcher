@@ -11,16 +11,16 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
 <body>
+    {% if user.is_authenticated %}
     <div id="root"></div>
-    
     <script type="text/javascript">
+
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof initReactApp === 'function') {
                 initReactApp();
             }
         });
     </script>
-
     {% verbatim %}
     <script type="text/babel">
         function initReactApp() {
@@ -114,7 +114,41 @@
                 };
                 
                 
-                
+                const sendSwipeDataToServer = (movie, isLiked) => {
+                    // Include the movieId in the URL
+                    fetch(`/movie_match/save_movie_data/${movie.id}/`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        isLiked,
+                        movieId: movie.id,
+                        title: movie.title,
+                        overview: movie.overview,
+                        release_date: movie.release_date,
+                        popularity: movie.popularity,
+                        vote_average: movie.vote_average,
+                        original_language: movie.original_language,
+                        original_title: movie.original_title,
+                        genre_ids: movie.genre_ids,
+                        backdrop_path: movie.backdrop_path,
+                        poster_path: movie.poster_path,
+                        video: movie.video,
+                        vote_count: movie.vote_count,
+                        adult: movie.adult
+                        // Add any other properties you wish to send
+                      })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Successfully sent swipe data:', data);
+                    })
+                    .catch(err => {
+                      console.error('Failed to send swipe data:', err);
+                    });
+                  };
+                  
 
 
                 const handleMouseOut = () => {
@@ -161,13 +195,23 @@ const handleMove = throttle((e) => {
                 const handleEnd = (e) => {
                     e.stopPropagation();
                     console.log('handleEnd triggered');  // Debugging log
-                    console.log('handleEnd:', 'startX was:', startX, 'and currentX is:', currentX);  // Debugging log
                 
                     const swipeDistance = Math.abs(currentX - startX);
                     console.log('Swipe distance:', swipeDistance);  // Debugging log
                 
                     if (swipeDistance > 200) {
                         console.log('Meaningful swipe detected');  // Debugging log
+                
+                        // Determine swipe direction
+                        let isLiked;
+                        if (currentX > startX) {
+                            console.log('Swipe right');
+                            isLiked = true; 
+                        } else {
+                            console.log('Swipe left');
+                            isLiked = false; 
+                        }
+                
                         setIsMeaningfulSwipe(true);
                 
                         setBottomIndex(prevTopIndex => prevTopIndex + 1);
@@ -179,6 +223,11 @@ const handleMove = throttle((e) => {
                             }
                             return newTopIndex;
                         });
+                        
+                        const movie = movies[topIndex];
+                        if (movie) {
+                            sendSwipeDataToServer(movie, isLiked);  // Note: Passing the entire 'movie' object
+                        }
                     } else {
                         console.log('Not a meaningful swipe');  // Debugging log
                         setIsMeaningfulSwipe(false);
@@ -188,6 +237,7 @@ const handleMove = throttle((e) => {
                     setStartX(0);
                     setCurrentX(0);
                 };
+                
                 
                 
                 if (movies.length < 2) {
@@ -230,5 +280,13 @@ const handleMove = throttle((e) => {
         }
     </script>
     {% endverbatim %}
+    
+    {% else %}
+    <script>
+        // Redirect user to login page if not authenticated
+        window.location.href = "{% url 'login' %}?message=To use Movie Matcher, you need to be logged in.";
+    </script>
+    {% endif %}
+
 </body>
 </html>

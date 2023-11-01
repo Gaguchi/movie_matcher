@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include  # Import 'include'
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('movie_match/', include('movie_match.urls')),  # Add this line
+    path('movie_match/', include('movie_match.urls', namespace='movie_match')),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register, name='register'),
 ]
