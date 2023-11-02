@@ -19,6 +19,9 @@ from django.urls import path, include  # Import 'include'
 from . import views
 
 urlpatterns = [
+    path('', views.index, name='index'),
+    path('user_search/', views.user_search, name='user_search'),
+    path('add_friend/<int:user_id>/', views.add_friend, name='add_friend'),
     path('admin/', admin.site.urls),
     path('movie_match/', include('movie_match.urls', namespace='movie_match')),
     path('login/', views.login_view, name='login'),

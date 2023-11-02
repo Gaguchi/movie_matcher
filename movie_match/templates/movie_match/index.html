@@ -1,19 +1,9 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Movie Match</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'movie_match/css/styles.css' %}" rel="stylesheet">
-    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-</head>
-<body>
-    {% if user.is_authenticated %}
-    <div id="root"></div>
-    <script type="text/javascript">
+{% extends 'home/layout.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div id="root"></div>
+<script type="text/javascript">
 
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof initReactApp === 'function') {
@@ -280,13 +270,12 @@ const handleMove = throttle((e) => {
         }
     </script>
     {% endverbatim %}
-    
     {% else %}
-    <script>
+    <script type="text/babel">
         // Redirect user to login page if not authenticated
         window.location.href = "{% url 'login' %}?message=To use Movie Matcher, you need to be logged in.";
     </script>
     {% endif %}
-
-</body>
-</html>
+    {% block scripts %}
+    {% endblock scripts %}
+    {% endblock content %}

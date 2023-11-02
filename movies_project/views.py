@@ -7,7 +7,7 @@ from movie_match.models import *
 import json
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def login_view(request):
@@ -68,3 +68,27 @@ def register(request):
             })
     else:
         return render(request, "movie_match/register.html")
+
+def index(request):
+    # Assuming 'home' is a directory inside your 'templates' directory
+    # and 'index.html' is the template you want to render
+    return render(request, "home/index.html")
+
+
+def user_search(request):
+    username = request.GET.get('username', None)
+    if username:
+        users = User.objects.filter(username__icontains=username)
+        return JsonResponse(list(users.values('id', 'username')), safe=False)
+    return JsonResponse({'error': 'No username provided.'}, status=400)
+
+@login_required
+def add_friend(request, user_id):
+    try:
+        friend = User.objects.get(id=user_id)
+        request.user.friends.add(friend)
+        return JsonResponse({'status': 'success'}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

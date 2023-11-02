@@ -24,6 +24,7 @@ class Movie(models.Model):
 
 
 class User(AbstractUser):
+    friends = models.ManyToManyField('self', related_name='friend_set', symmetrical=True, blank=True)
     movies_interested = models.ManyToManyField(Movie, related_name='interested_users', blank=True)
     movies_not_interested = models.ManyToManyField(Movie, related_name='not_interested_users', blank=True)
     movies_liked = models.ManyToManyField(Movie, related_name='liked_by_users', blank=True)

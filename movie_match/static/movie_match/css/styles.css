@@ -19,10 +19,9 @@ body {
     background-color: rgb(255, 255, 255);
     background-size: cover;
     background-position: center;
-    height: 100vh;
+    height: 100%;
     backdrop-filter: blur(10px);
     transition: background-image 1s ease-in-out; 
-    overflow: hidden;
 }
 
 .card {
