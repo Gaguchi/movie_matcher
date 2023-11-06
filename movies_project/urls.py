@@ -20,6 +20,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('profile/<str:username>/', views.profile_view, name='profile'),
     path('user_search/', views.user_search, name='user_search'),
     path('add_friend/<int:user_id>/', views.add_friend, name='add_friend'),
     path('admin/', admin.site.urls),

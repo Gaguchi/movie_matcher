@@ -10,6 +10,10 @@
     <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/javascript">
+        // This script tag should be in the head or at the end of the body.
+        var profileUrlTemplate = "{% url 'profile' 'USERNAME_PLACEHOLDER' %}";
+    </script>
     {% block head %}{% endblock head %}
 </head>
 <body>
@@ -30,6 +34,10 @@
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' user.username %}">{{ user.username }}</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -110,13 +118,14 @@ function searchFriend() {
             if (data.length > 0) {
                 // Loop through the results and append them to the searchResults div
                 data.forEach(function(user) {
+                    var profileUrl = profileUrlTemplate.replace('USERNAME_PLACEHOLDER', user.username);
                     $('#searchResults').append(
                         '<div class="search-result-item">' +
-                        '<span>' + user.username + '</span>' +
-                        '<button onclick="addFriend(' + user.id + ')">Add Friend</button>' +
+                        '<a href="' + profileUrl + '">' + user.username + '</a>' +
+                        '<button onclick="addFriend(' + user.id + ')"> Add Friend</button>' +
                         '</div>'
                     );
-                });
+                });                
             } else {
                 $('#searchResults').append('<p>No users found.</p>');
             }

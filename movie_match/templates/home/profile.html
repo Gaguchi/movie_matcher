@@ -1,0 +1,33 @@
+{% extends 'home/layout.html' %} <!-- Replace with your base template -->
+
+{% block content %}
+<h1>{{ user.username }}'s Profile</h1>
+
+<h2>Friends</h2>
+<ul>
+  {% for friend in user.friends.all %}
+  <li>{{ friend.username }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Movies Interested In</h2>
+<ul>
+  {% for movie in user.movies_interested.all %}
+  <li>{{ movie.title }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Movies Liked</h2>
+<ul>
+  {% for movie in user.movies_liked.all %}
+  <li>{{ movie.title }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Movies Disliked</h2>
+<ul>
+  {% for movie in user.movies_disliked.all %}
+  <li>{{ movie.title }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

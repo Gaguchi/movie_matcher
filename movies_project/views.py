@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from movie_match.models import *
 import json
@@ -92,3 +92,8 @@ def add_friend(request, user_id):
         return JsonResponse({'error': 'User not found.'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def profile_view(request, username):
+    user = get_object_or_404(User, username=username)
+    return render(request, 'home/profile.html', {'user': user})
