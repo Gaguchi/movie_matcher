@@ -6,6 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpRe
 from .models import *
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 # Create your views here.
 
@@ -55,6 +57,15 @@ def save_movie_data(request, movie_id=None):
         print(f"An error occurred: {e}")
         return JsonResponse({"error": f"An error occurred: {e}"}, status=500)
 
+@login_required
+def wheel_of_movies(request):
+    user = request.user
+    interested_movies_qs = user.movies_interested.all()[:8]
+    # Serializing the queryset to JSON format
+    interested_movies = serializers.serialize('json', interested_movies_qs)
+    return render(request, "movie_match/wheel_of_movies.html", {
+        "interested_movies_json": interested_movies  # Pass the serialized JSON to the template
+    })
 
 def index(request):
     return render(request, "movie_match/index.html")

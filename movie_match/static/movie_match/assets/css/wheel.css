@@ -1,0 +1,120 @@
+:root {
+    --segment-angle: 45deg; /* 360 degrees divided by the number of segments (e.g., 8) */
+  }
+  /* wheel.css content */
+#movieWheelCanvas {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #000; /* Optional, for visual reference */
+  }
+  
+  /* Ensures that the canvas is centered within its container */
+  .canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Set to the desired height */
+  }
+  
+
+  .wheel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  #wheel {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 50%;
+    clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+    position: relative;
+    border: 2px solid #000;
+    overflow: hidden;
+    margin: auto;
+    transform: translateZ(0); /* GPU acceleration for smoother animation */
+  }
+  
+  .wheel-segment {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 50%;
+    clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+  }
+  
+  /* Create individual segments */
+  .wheel-segment:nth-child(1) {
+    background-color: #FFDD59;
+    transform: rotate(0deg);
+  }
+  .wheel-segment:nth-child(2) {
+    background-color: #FFABAB;
+    transform: rotate(var(--segment-angle));
+  }
+  .wheel-segment:nth-child(3) {
+    background-color: #FF61A6;
+    transform: rotate(calc(2 * var(--segment-angle)));
+  }
+  .wheel-segment:nth-child(4) {
+    background-color: #BAFFB4;
+    transform: rotate(calc(3 * var(--segment-angle)));
+  }
+  .wheel-segment:nth-child(5) {
+    background-color: #59FFC8;
+    transform: rotate(calc(4 * var(--segment-angle)));
+  }
+  .wheel-segment:nth-child(6) {
+    background-color: #59BFFF;
+    transform: rotate(calc(5 * var(--segment-angle)));
+  }
+  .wheel-segment:nth-child(7) {
+    background-color: #5956FF;
+    transform: rotate(calc(6 * var(--segment-angle)));
+  }
+  .wheel-segment:nth-child(8) {
+    background-color: #C459FF;
+    transform: rotate(calc(7 * var(--segment-angle)));
+  }
+  
+  #spin-button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  #spin-button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Ensures that the wheel does not exceed the viewport height */
+  @media screen and (max-height: 500px) {
+    #wheel {
+      width: 50vh; /* 50% of the viewport height */
+      height: 50vh; /* 50% of the viewport height */
+    }
+  }
+
+  #indicator {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid black; /* The color of the triangle */
+    position: absolute;
+    top: calc(50% - 20px); /* Adjust based on the actual position of your canvas */
+    left: calc(50% - 20px); /* Center the triangle based on your layout */
+    z-index: 10; /* Make sure it's above the canvas */
+}

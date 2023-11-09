@@ -1,0 +1,54 @@
+{% extends 'home/Layout_v2.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/wheel.css' %}">
+<!-- Page Content Start -->
+<div class="canvas-container"><!-- Add this in your HTML where the canvas is defined -->
+    <div id="indicator"></div>    
+    <canvas id="movieWheelCanvas" width="500" height="500"></canvas>
+    <button id="spinButton" type="button">Spin the Wheel</button>
+</div>
+<!-- Page Content End -->
+
+<script src="{% static 'movie_match/assets/js/wheel.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Now canvas and ctx are accessible anywhere after DOM has loaded
+        window.canvas = document.getElementById('movieWheelCanvas');
+        window.ctx = canvas.getContext('2d');
+    
+        // Rest of your code that depends on canvas and ctx
+    });
+    
+    // Use the JSON string provided by the Django view
+    var movies = JSON.parse('{{ interested_movies_json|escapejs  }}');
+    console.log(movies);
+    // This will be executed when the page is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Draw the wheel with the movies
+        drawWheel(movies);
+    });
+
+    // Global rotation angle
+var rotationAngle = 0;
+
+document.getElementById('spinButton').addEventListener('click', function() {
+    // Calculate a new rotation angle
+    var newAngle = rotationAngle + Math.random() * 360 + 360 * 5; // Random spin plus 5 full rotations
+    rotationAngle = newAngle % 360; // Keep the angle in the range [0, 360)
+    
+    // Animate the spin
+    var currentAngle = rotationAngle;
+    var interval = setInterval(function() {
+        currentAngle += (newAngle - currentAngle) * 0.1; // Ease the spin
+        canvas.style.transform = 'rotate(' + currentAngle + 'deg)';
+        if (Math.abs(newAngle - currentAngle) < 0.5) {
+            canvas.style.transform = 'rotate(' + newAngle + 'deg)';
+            clearInterval(interval);
+        }
+    }, 16); // Approximately 60 fps
+});
+
+</script>
+{% endblock %}

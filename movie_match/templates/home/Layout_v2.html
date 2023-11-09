@@ -63,7 +63,7 @@
 					</div>
 					<div class="mid-content header-logo">
 						<a href="home.html">
-							<img src="{% static 'movie_match/assets/images/logo.png' %}" alt="">
+							<img src="{% static 'movie_match/assets/images/MovieMatcher.png' %}" alt="">
 						</a>
 					</div>
 					<div class="right-content dz-meta">
@@ -188,13 +188,13 @@
 	<!-- Menubar -->
 	<div class="menubar-area footer-fixed">
 		<div class="toolbar-inner menubar-nav">
-			<a href="home.html" class="nav-link active">
+			<a href="{% url 'index' %}" class="nav-link active">
 				<i class="flaticon flaticon-dog-house"></i>
 			</a>
 			<a href="explore.html" class="nav-link">
 				<i class="flaticon flaticon-search"></i>
 			</a>
-			<a href="wishlist.html" class="nav-link">
+			<a href="{% url 'movie_match:wheel_of_movies' %}" class="nav-link">
 				<i class="flaticon flaticon-heart"></i>
 			</a>
 			<a href="chat-list.html" class="nav-link">
