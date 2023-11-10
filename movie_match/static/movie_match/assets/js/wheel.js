@@ -2,6 +2,8 @@ var imageScale = 0.9;
 var imagePosition = 100;
 var wheelRotationAngle = 0; // Global rotation angle for the wheel
 var isSpinning = false;
+var adjustedAngleOffset = 68; // Initial offset value
+
 
 // Preloaded images and their state
 var wheelImages = [];
@@ -22,6 +24,7 @@ function loadWheelImages(movies, callback) {
     });
     console.log(movies)
 }
+
 
 // Function to draw the wheel with movies
 function drawWheel(canvas, rotationAngle) {
@@ -72,6 +75,7 @@ function drawWheel(canvas, rotationAngle) {
     drawIndicator(canvas);
 }
 
+
 // Function to draw the indicator (static)
 function drawIndicator(canvas) {
     var ctx = canvas.getContext('2d');
@@ -101,6 +105,29 @@ function drawCenterButton(canvas) {
     ctx.fillText('Spin', canvas.width / 2 - ctx.measureText('Spin').width / 2, canvas.height / 2 + 10);
 }
 
+// Function to determine and log the winning movie
+function calculateWinner(angle, numberOfSegments, movies) {
+    var finalAngle = angle % 360;
+    if (finalAngle < 0) finalAngle += 360;
+
+    var adjustedAngle = (finalAngle + adjustedAngleOffset + (360 / numberOfSegments / 2)) % 360;
+    if (adjustedAngle < 0) adjustedAngle += 360;
+
+    var winningIndex = Math.floor(numberOfSegments * (1 - adjustedAngle / 360));
+
+    if (winningIndex >= 0 && winningIndex < movies.length) {
+        var winningMovie = movies[winningIndex];
+        console.log('Winning Movie:', winningMovie.fields.title);
+        // Display winning movie in the HTML
+        document.getElementById('winnerDisplay').innerText = 'Winning Movie: ' + winningMovie.fields.title;
+    } else {
+        console.error('Invalid Winning Index:', winningIndex);
+        // Display error or default message in the HTML
+        document.getElementById('winnerDisplay').innerText = 'Invalid Winning Index';
+    }
+}
+
+
 // Function to spin the wheel
 function spinWheel(canvas) {
     if (isSpinning) {
@@ -124,17 +151,15 @@ function spinWheel(canvas) {
     var interval = setInterval(function() {
         currentAngle += (newAngle - currentAngle) * 0.1;
         drawWheel(canvas, currentAngle);
+
         if (Math.abs(newAngle - currentAngle) < 0.5) {
             clearInterval(interval);
-            isSpinning = false; // Reset the flag once the spin is complete
-            // Determine the winning movie
-            var winningIndex = Math.floor(((270 - (newAngle % 360)) / 360) * numberOfSegments) % numberOfSegments;
-            var winningMovie = movies[winningIndex];
-            console.log('Winning movie:', winningMovie.fields.title); // Log the title of the winning movie
+            isSpinning = false;
+
+            calculateWinner(currentAngle, numberOfSegments, movies);
         }
     }, 16);
 }
-
 
 // Initial setup and image loading
 window.onload = function() {

@@ -8,6 +8,7 @@
     <canvas id="movieWheelCanvas" width="500" height="500"></canvas>
     <!-- Hidden element to store movies data -->
     <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
+
 </div>
 <!-- Page Content End -->
 
@@ -25,6 +26,34 @@
             spinWheel(canvas);
         });
     });
+
+    // Event listener for Adjusted Angle Offset slider
+    document.getElementById('angleOffset').addEventListener('input', function() {
+        adjustedAngleOffset = parseInt(this.value);
+        document.getElementById('angleOffsetValue').innerText = adjustedAngleOffset;
+        // Recalculate and display the winner
+        var moviesElement = document.getElementById('movies-data');
+        if (moviesElement) {
+            var movies = JSON.parse(moviesElement.textContent);
+            var numberOfSegments = Math.min(movies.length, 8);
+            calculateWinner(wheelRotationAngle, numberOfSegments, movies);
+        }
+    });
+
+    // Event listener for Manual Wheel Rotation slider
+    document.getElementById('manualRotation').addEventListener('input', function() {
+        var manualAngle = parseInt(this.value);
+        document.getElementById('manualRotationValue').innerText = manualAngle;
+        // Set the wheel to the manual angle and recalculate the winner
+        drawWheel(document.getElementById('movieWheelCanvas'), manualAngle);
+        var moviesElement = document.getElementById('movies-data');
+        if (moviesElement) {
+            var movies = JSON.parse(moviesElement.textContent);
+            var numberOfSegments = Math.min(movies.length, 8);
+            calculateWinner(manualAngle, numberOfSegments, movies);
+        }
+    });
 </script>
+
 
 {% endblock %}
