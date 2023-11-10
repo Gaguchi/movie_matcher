@@ -1,19 +1,33 @@
-var movies = JSON.parse(document.getElementById('movies-data').textContent);
+var imageScale = 0.9;
+var imagePosition = 100;
+var wheelRotationAngle = 0; // Global rotation angle for the wheel
 
-function drawWheel(movies) {
-    var canvas = document.getElementById('movieWheelCanvas');
+// Function to draw the wheel with movies
+function drawWheel(canvas, rotationAngle) {
     var ctx = canvas.getContext('2d');
-    var numberOfSegments = Math.min(movies.length, 8);
-    var angle = 0;
-    var arc = Math.PI * 2 / numberOfSegments;
-    var outsideRadius = canvas.width / 2 - 20; // Adjust for edge padding
-    var insideRadius = 20; // Small radius for the inner circle
+    var moviesElement = document.getElementById('movies-data');
 
-    // Clear the canvas
+    if (!moviesElement) {
+        console.error('Movies data element not found');
+        return;
+    }
+
+    var movies = JSON.parse(moviesElement.textContent);
+
+    if (!Array.isArray(movies)) {
+        console.error('Invalid movies data:', movies);
+        return;
+    }
+
+    var numberOfSegments = Math.min(movies.length, 8);
+    var angle = rotationAngle * Math.PI / 180;
+    var arc = Math.PI * 2 / numberOfSegments;
+    var outsideRadius = canvas.width / 2 - 20;
+    var insideRadius = 20;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     movies.forEach(function(movie, index) {
-        // Draw slice
         var angleStart = angle + index * arc;
         var angleEnd = angleStart + arc;
 
@@ -21,10 +35,9 @@ function drawWheel(movies) {
         ctx.arc(canvas.width / 2, canvas.height / 2, outsideRadius, angleStart, angleEnd, false);
         ctx.arc(canvas.width / 2, canvas.height / 2, insideRadius, angleEnd, angleStart, true);
         ctx.closePath();
-        ctx.fillStyle = 'hsl(' + (index * 360 / numberOfSegments) + ', 100%, 50%)'; // Color for the slice
+        ctx.fillStyle = 'hsl(' + (index * 360 / numberOfSegments) + ', 100%, 50%)';
         ctx.fill();
 
-        // Load the image
         var image = new Image();
         image.onload = function() {
             ctx.save();
@@ -32,19 +45,16 @@ function drawWheel(movies) {
             ctx.arc(canvas.width / 2, canvas.height / 2, outsideRadius, angleStart, angleEnd, false);
             ctx.arc(canvas.width / 2, canvas.height / 2, insideRadius, angleEnd, angleStart, true);
             ctx.closePath();
-            ctx.clip(); // Clip to the slice's shape
+            ctx.clip();
 
-            // Calculate the position for the image
-            var imageX = canvas.width / 2 + Math.cos(angleStart + arc / 2) * insideRadius;
-            var imageY = canvas.height / 2 + Math.sin(angleStart + arc / 2) * insideRadius;
-
-            // Calculate the scaled image size to fit within the segment
             var scale = Math.min((outsideRadius - insideRadius) / image.width, (outsideRadius - insideRadius) / image.height);
-            scale *= 2;
+            scale *= imageScale; // Apply the scale from the variable
             var scaledWidth = scale * image.width;
             var scaledHeight = scale * image.height;
 
-            // Draw the image centered and rotated in the segment
+            var imageX = canvas.width / 2 + Math.cos(angleStart + arc / 2) * (insideRadius + imagePosition);
+            var imageY = canvas.height / 2 + Math.sin(angleStart + arc / 2) * (insideRadius + imagePosition);
+
             ctx.translate(imageX, imageY);
             ctx.rotate(angleStart + arc / 2 + Math.PI / 2);
             ctx.drawImage(image, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
@@ -53,34 +63,72 @@ function drawWheel(movies) {
         image.src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + movie.fields.poster_path;
     });
 
-    // Draw the indicator
-    function drawIndicator() {
-        ctx.fillStyle = 'black';
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2 - 10, 0);
-        ctx.lineTo(canvas.width / 2 + 10, 0);
-        ctx.lineTo(canvas.width / 2, 30);
-        ctx.fill();
-    }
-
-    // Draw the center button
-    function drawCenterButton() {
-        // Draw white circle for the center button
-        ctx.fillStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, insideRadius, 0, Math.PI * 2, false);
-        ctx.fill();
-
-        // Draw the button
-        ctx.fillStyle = '#333'; // Button color
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, insideRadius / 2, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('Spin', canvas.width / 2 - ctx.measureText('Spin').width / 2, canvas.height / 2 + 10);
-    }
+    drawCenterButton(canvas);
+    drawIndicator(canvas);
 }
 
-// Call the drawWheel function with your movies data
-drawWheel(movies);
+// Function to draw the indicator (static)
+function drawIndicator(canvas) {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 10, 0);
+    ctx.lineTo(canvas.width / 2 + 10, 0);
+    ctx.lineTo(canvas.width / 2, 30);
+    ctx.fill();
+}
+
+// Function to draw the center button (static)
+function drawCenterButton(canvas) {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI * 2, false);
+    ctx.fill();
+
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 10, 0, Math.PI * 2, false);
+    ctx.fill();
+
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.fillText('Spin', canvas.width / 2 - ctx.measureText('Spin').width / 2, canvas.height / 2 + 10);
+}
+
+// Function to spin the wheel
+function spinWheel(canvas) {
+    var ctx = canvas.getContext('2d');
+
+    var newAngle = wheelRotationAngle + Math.random() * 360 + 360 * 5;
+    wheelRotationAngle = newAngle % 360;
+
+    var currentAngle = wheelRotationAngle;
+    var interval = setInterval(function() {
+        currentAngle += (newAngle - currentAngle) * 0.1;
+        drawWheel(canvas, currentAngle);
+        if (Math.abs(newAngle - currentAngle) < 0.5) {
+            clearInterval(interval);
+        }
+    }, 16);
+}
+
+// Event listener for the wheel
+document.getElementById('movieWheelCanvas').addEventListener('click', function() {
+    var canvas = document.getElementById('movieWheelCanvas');
+    spinWheel(canvas);
+});
+
+// Initial setup to draw static parts of the wheel
+window.onload = function() {
+    var canvas = document.getElementById('movieWheelCanvas');
+    if (canvas) {
+        drawCenterButton(canvas);
+        drawIndicator(canvas);
+        drawWheel(canvas, 0); // Draw initial wheel
+    } else {
+        console.error('Canvas element not found');
+    }
+};
+
+// ... [Any additional code or event listeners for sliders]

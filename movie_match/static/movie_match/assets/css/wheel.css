@@ -118,3 +118,11 @@
     left: calc(50% - 20px); /* Center the triangle based on your layout */
     z-index: 10; /* Make sure it's above the canvas */
 }
+
+.settings {
+  margin: 20px 0;
+}
+
+.settings input[type=range] {
+  width: 100%;
+}
