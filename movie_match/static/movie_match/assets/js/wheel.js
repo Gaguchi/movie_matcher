@@ -1,5 +1,5 @@
 var imageScale = 0.9;
-var imagePosition = 100;
+var imagePosition = 105;
 var wheelRotationAngle = 0; // Global rotation angle for the wheel
 var isSpinning = false;
 var adjustedAngleOffset = 68; // Initial offset value
@@ -46,7 +46,13 @@ function drawWheel(canvas, rotationAngle) {
         ctx.arc(canvas.width / 2, canvas.height / 2, outsideRadius, angleStart, angleEnd, false);
         ctx.arc(canvas.width / 2, canvas.height / 2, insideRadius, angleEnd, angleStart, true);
         ctx.closePath();
-        ctx.fillStyle = 'hsl(' + (index * 360 / numberOfSegments) + ', 100%, 50%)';
+
+        // Alternate colors between grey and dark grey
+        ctx.fillStyle = index % 2 === 0 ? '#eeeeee' : '#dbdbdb'; // '#808080' is grey, '#404040' is dark grey
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Shadow color
+        ctx.shadowBlur = 3; // Blur level
+        ctx.shadowOffsetX = 2; // Horizontal offset
+        ctx.shadowOffsetY = 1; // Vertical offset
         ctx.fill();
 
         // Draw image
@@ -76,33 +82,54 @@ function drawWheel(canvas, rotationAngle) {
 }
 
 
+
 // Function to draw the indicator (static)
 function drawIndicator(canvas) {
     var ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'black';
+
+    // Set shadow properties
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Shadow color
+    ctx.shadowBlur = 3; // Blur level
+    ctx.shadowOffsetX = 2; // Horizontal offset
+    ctx.shadowOffsetY = 1; // Vertical offset
+
+    // Draw the indicator with shadow
+    ctx.fillStyle = '#dab694';
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 10, 0);
-    ctx.lineTo(canvas.width / 2 + 10, 0);
-    ctx.lineTo(canvas.width / 2, 30);
+    ctx.moveTo(canvas.width / 2 - 20, 5);
+    ctx.lineTo(canvas.width / 2 + 20, 5);
+    ctx.lineTo(canvas.width / 2, 40);
+    ctx.closePath();
     ctx.fill();
+
+    // Reset shadow properties to avoid affecting other elements
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
 }
+
 
 // Function to draw the center button (static)
 function drawCenterButton(canvas) {
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = 'white';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Shadow color
+    ctx.shadowBlur = 3; // Blur level
+    ctx.shadowOffsetX = 2; // Horizontal offset
+    ctx.shadowOffsetY = 1; // Vertical offset
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI * 2, false);
+    ctx.arc(canvas.width / 2, canvas.height / 2, 30, 0, Math.PI * 2, false);
     ctx.fill();
 
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#dab694';
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 10, 0, Math.PI * 2, false);
+    ctx.arc(canvas.width / 2, canvas.height / 2, 25, 0, Math.PI * 2, false);
     ctx.fill();
 
     ctx.fillStyle = 'white';
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText('Spin', canvas.width / 2 - ctx.measureText('Spin').width / 2, canvas.height / 2 + 10);
+    ctx.fillText('Spin', canvas.width / 2 - ctx.measureText('Spin').width / 2, canvas.height / 2 + 6);
 }
 
 // Function to determine and log the winning movie

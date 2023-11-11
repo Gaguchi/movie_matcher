@@ -60,9 +60,6 @@
 					<div class="dzSwipe_card__option dzLike">
 						<i class="fa-solid fa-check"></i>
 					</div>
-					<div class="dzSwipe_card__option dzSuperlike">
-						<h5 class="title mb-0">Super Like</h5>
-					</div>
 					<div class="dzSwipe_card__drag"></div>
 				</div>
                 );
@@ -123,7 +120,7 @@
                 
                 
                 
-                const sendSwipeDataToServer = (movie, isLiked) => {
+                const sendSwipeDataToServer = (movie, isInterested, isNotInterested) => {
                     // Include the movieId in the URL
                     fetch(`/movie_match/save_movie_data/${movie.id}/`, {
                       method: 'POST',
@@ -131,7 +128,8 @@
                         'Content-Type': 'application/json'
                       },
                       body: JSON.stringify({
-                        isLiked,
+                        isInterested,
+                        isNotInterested,
                         movieId: movie.id,
                         title: movie.title,
                         overview: movie.overview,
@@ -212,13 +210,14 @@
                         console.log('Meaningful swipe detected');  // Debugging log
                 
                         // Determine swipe direction
-                        let isLiked;
+                        let isInterested;
+                        let isNotInterested;
                         if (currentX > startX) {
                             console.log('Swipe right');
-                            isLiked = true; 
+                            isInterested = true; 
                         } else {
                             console.log('Swipe left');
-                            isLiked = false; 
+                            isNotInterested = true; 
                         }
                 
                         setIsMeaningfulSwipe(true);
@@ -235,7 +234,7 @@
                         
                         const movie = movies[topIndex];
                         if (movie) {
-                            sendSwipeDataToServer(movie, isLiked);  // Note: Passing the entire 'movie' object
+                            sendSwipeDataToServer(movie, isInterested, isNotInterested);  // Note: Passing the entire 'movie' object
                         }
                     } else {
                         console.log('Not a meaningful swipe');  // Debugging log

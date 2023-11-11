@@ -18,7 +18,8 @@ def save_movie_data(request, movie_id=None):
             return JsonResponse({"error": "Only POST requests are allowed"}, status=405)
 
         data = json.loads(request.body)
-        is_liked = data.get('isLiked')
+        is_interested = data.get('isInterested')
+        is_not_interested = data.get('isNotInterested')
 
         # Check if the movie already exists in the database
         movie_exists = Movie.objects.filter(movie_id=movie_id).exists()
@@ -46,9 +47,9 @@ def save_movie_data(request, movie_id=None):
         # Assuming the user is logged in
         if request.user.is_authenticated:
             movie = Movie.objects.get(movie_id=movie_id)
-            if is_liked:
+            if is_interested:
                 request.user.movies_interested.add(movie)
-            else:
+            elif is_not_interested:
                 request.user.movies_not_interested.add(movie)
 
         return JsonResponse({"message": "Movie data and preferences saved successfully."}, status=201)

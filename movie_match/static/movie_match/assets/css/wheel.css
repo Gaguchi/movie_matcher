@@ -7,7 +7,7 @@
     margin: auto;
     max-width: 100%;
     height: auto;
-    border: 1px solid #000; /* Optional, for visual reference */
+    border: 0px solid #000; /* Optional, for visual reference */
   }
   
   /* Ensures that the canvas is centered within its container */
@@ -107,16 +107,8 @@
     }
   }
 
-  #indicator {
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 20px solid black; /* The color of the triangle */
-    position: absolute;
-    top: calc(50% - 20px); /* Adjust based on the actual position of your canvas */
-    left: calc(50% - 20px); /* Center the triangle based on your layout */
-    z-index: 10; /* Make sure it's above the canvas */
+#indicator{
+  box-shadow: 5px 5px black;
 }
 
 .settings {
