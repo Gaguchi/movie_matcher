@@ -20,37 +20,39 @@ def save_movie_data(request, movie_id=None):
         data = json.loads(request.body)
         is_interested = data.get('isInterested')
         is_not_interested = data.get('isNotInterested')
+        seen_liked = data.get('seenLiked')
+        seen_disliked = data.get('seenDisliked')
 
         # Check if the movie already exists in the database
-        movie_exists = Movie.objects.filter(movie_id=movie_id).exists()
-
-        if not movie_exists:
-            # Create a new Movie object
-            new_movie = Movie(
-                movie_id=movie_id,
-                adult=data.get('adult', False),
-                backdrop_path=data.get('backdrop_path'),
-                genre_ids=json.dumps(data.get('genre_ids', [])),
-                original_language=data.get('original_language'),
-                original_title=data.get('original_title'),
-                overview=data.get('overview'),
-                popularity=data.get('popularity'),
-                poster_path=data.get('poster_path'),
-                release_date=data.get('release_date'),
-                title=data.get('title'),
-                video=data.get('video', False),
-                vote_average=data.get('vote_average'),
-                vote_count=data.get('vote_count'),
-            )
-            new_movie.save()
+        movie, created = Movie.objects.get_or_create(
+            movie_id=movie_id,
+            defaults={
+                'adult': data.get('adult', False),
+                'backdrop_path': data.get('backdrop_path'),
+                'genre_ids': json.dumps(data.get('genre_ids', [])),
+                'original_language': data.get('original_language'),
+                'original_title': data.get('original_title'),
+                'overview': data.get('overview'),
+                'popularity': data.get('popularity'),
+                'poster_path': data.get('poster_path'),
+                'release_date': data.get('release_date'),
+                'title': data.get('title'),
+                'video': data.get('video', False),
+                'vote_average': data.get('vote_average'),
+                'vote_count': data.get('vote_count'),
+            }
+        )
 
         # Assuming the user is logged in
         if request.user.is_authenticated:
-            movie = Movie.objects.get(movie_id=movie_id)
             if is_interested:
                 request.user.movies_interested.add(movie)
             elif is_not_interested:
                 request.user.movies_not_interested.add(movie)
+            if seen_liked:
+                request.user.movies_liked.add(movie)
+            elif seen_disliked:
+                request.user.movies_disliked.add(movie)
 
         return JsonResponse({"message": "Movie data and preferences saved successfully."}, status=201)
 

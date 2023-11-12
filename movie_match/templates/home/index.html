@@ -28,7 +28,7 @@
 
             const getRandomPage = () => Math.floor(Math.random() * 400) + 1;
 
-            const MovieInfo = ({ movie }) => {
+            const MovieInfo = ({ movie, onLikedClick, onDislikedClick  }) => {
                 if (!movie) return null;
 
                 const truncatedOverview = movie && movie.overview && movie.overview.length > 150 
@@ -48,10 +48,10 @@
 							<span class="badge style-3 mb-2">Release Date: {movie.release_date}</span>
 							<h4 class="title"><a href="profile-detail.html">{movie.title}</a></h4>
 							<p><i class="icon feather icon-map-pin"></i>Vote Average: {movie.vote_average}</p>		
-							<div class="meta-btn">
-								<a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100">Seen: Disliked<i class="feather icon-x"></i></a>
-								<a href="javascript:void(0);" class="btn btn-info rounded-xl w-100">Seen: Liked<i class="feather icon-heart-on"></i></a>
-							</div>					
+                            <div class="meta-btn">
+                                <a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100" onClick={() => onDislikedClick(movie)}>Seen: Disliked<i class="feather icon-x"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-info rounded-xl w-100" onClick={() => onLikedClick(movie)}>Seen: Liked<i class="feather icon-heart-on"></i></a>
+                            </div>			
 						</div>
 					</div>
 					<div class="dzSwipe_card__option dzReject">
@@ -74,8 +74,35 @@
                 const [currentX, setCurrentX] = useState(0);
                 const [isSwiping, setIsSwiping] = useState(false);
                 const [isMeaningfulSwipe, setIsMeaningfulSwipe] = useState(false);
+                const [seenLiked, setSeenLiked] = useState(false);
+                const [seenDisliked, setSeenDisliked] = useState(false);
 
                 const [lastFetchTime, setLastFetchTime] = useState(0);
+
+                const handleLikedClick = (movie) => {
+                    setSeenLiked(true);
+                    setSeenDisliked(false);
+                    sendSwipeDataToServer(movie, true, false, true, false);
+                    moveToNextMovie();
+                };
+                
+                const handleDislikedClick = (movie) => {
+                    setSeenLiked(false);
+                    setSeenDisliked(true);
+                    sendSwipeDataToServer(movie, false, true, false, true);
+                    moveToNextMovie();
+                };
+            
+                const moveToNextMovie = () => {
+                    setBottomIndex(prevBottomIndex => prevBottomIndex + 1);
+                    setTopIndex(prevTopIndex => {
+                        const newTopIndex = prevTopIndex + 1;
+                        if (newTopIndex > movies.length - 3) {
+                            fetchMovies();
+                        }
+                        return newTopIndex;
+                    });
+                };
 
                 const fetchMovies = () => {
                     const currentTime = new Date().getTime();
@@ -120,7 +147,7 @@
                 
                 
                 
-                const sendSwipeDataToServer = (movie, isInterested, isNotInterested) => {
+                const sendSwipeDataToServer = (movie, isInterested, isNotInterested, liked, disliked) => {
                     // Include the movieId in the URL
                     fetch(`/movie_match/save_movie_data/${movie.id}/`, {
                       method: 'POST',
@@ -130,6 +157,8 @@
                       body: JSON.stringify({
                         isInterested,
                         isNotInterested,
+                        seenLiked: liked,
+                        seenDisliked: disliked,
                         movieId: movie.id,
                         title: movie.title,
                         overview: movie.overview,
@@ -247,7 +276,6 @@
                 };
                 
                 
-                
                 if (movies.length < 2) {
                     return <div>Loading...</div>;
                 }
@@ -271,7 +299,7 @@
                                 }} 
                                 key={`${movies[index] ? movies[index].id : index}-${i}`} // Unique key for each card
                             >
-                                <MovieInfo movie={movies[index]} /> {/* Ensure the movie object is passed directly */}
+                            <MovieInfo movie={movies[index]} onLikedClick={handleLikedClick} onDislikedClick={handleDislikedClick} />{/* Ensure the movie object is passed directly */}
                             </div>
                         ))}
                     </div>               
