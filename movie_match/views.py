@@ -8,6 +8,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+import traceback
+
 
 # Create your views here.
 
@@ -45,19 +47,28 @@ def save_movie_data(request, movie_id=None):
 
         # Assuming the user is logged in
         if request.user.is_authenticated:
+            request.user.movies_interested.remove(movie)
+            request.user.movies_not_interested.remove(movie)
+            request.user.movies_liked.remove(movie)
+            request.user.movies_disliked.remove(movie)
+            request.user.movies_neutral.remove(movie)
+
             if is_interested:
                 request.user.movies_interested.add(movie)
             elif is_not_interested:
                 request.user.movies_not_interested.add(movie)
-            if seen_liked:
+            elif seen_liked:
                 request.user.movies_liked.add(movie)
             elif seen_disliked:
                 request.user.movies_disliked.add(movie)
 
-        return JsonResponse({"message": "Movie data and preferences saved successfully."}, status=201)
+        interested_movies_qs = request.user.movies_interested.all()[:8]
+        interested_movies = serializers.serialize('json', interested_movies_qs)
+        return JsonResponse({"message": "Movie data and preferences saved successfully.", "updated_movies": interested_movies}, status=201)
+
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        traceback.print_exc()  # Prints the full traceback
         return JsonResponse({"error": f"An error occurred: {e}"}, status=500)
 
 @login_required

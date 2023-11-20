@@ -3,7 +3,7 @@ var imagePosition = 105;
 var wheelRotationAngle = 0; // Global rotation angle for the wheel
 var isSpinning = false;
 var adjustedAngleOffset = 68; // Initial offset value
-
+var winningMovieData = null;
 
 // Preloaded images and their state
 var wheelImages = [];
@@ -145,12 +145,16 @@ function calculateWinner(angle, numberOfSegments, movies) {
     if (winningIndex >= 0 && winningIndex < movies.length) {
         var winningMovie = movies[winningIndex];
         console.log('Winning Movie:', winningMovie.fields.title);
-        // Display winning movie in the HTML
-        document.getElementById('winnerDisplay').innerText = 'Winning Movie: ' + winningMovie.fields.title;
+        winningMovieData = winningMovie;
+
+        // Update and show the modal with winning movie details
+        var modal = document.getElementById('exampleModalCenter');
+        modal.querySelector('.modal-title').textContent = 'Winning Movie';
+        modal.querySelector('.modal-body p').textContent = winningMovie.fields.title;
+        var modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
     } else {
         console.error('Invalid Winning Index:', winningIndex);
-        // Display error or default message in the HTML
-        document.getElementById('winnerDisplay').innerText = 'Invalid Winning Index';
     }
 }
 

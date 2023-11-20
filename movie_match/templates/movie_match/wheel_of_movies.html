@@ -25,6 +25,16 @@
         canvas.addEventListener('click', function() {
             spinWheel(canvas);
         });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('Liked')) {
+                console.log('Liked button clicked');
+                handleLikeDislikeClick(true);
+            } else if (event.target.classList.contains('Disliked')) {
+                console.log('Disliked button clicked');
+                handleLikeDislikeClick(false);
+            }
+        });
     });
 
     // Event listener for Adjusted Angle Offset slider
@@ -53,7 +63,127 @@
             calculateWinner(manualAngle, numberOfSegments, movies);
         }
     });
+
+    // Function to send movie data to the server
+    function sendMovieData(movie, liked) {
+        console.log('Sending movie data:', movie, 'Liked:', liked);  // Log the movie data and liked status
+
+        // Return the fetch promise
+        return fetch(`/movie_match/save_movie_data/${movie.fields.movie_id}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                seenLiked: liked,
+                seenDisliked: !liked,
+                movieId: movie.fields.movie_id,
+                title: movie.fields.title,
+                overview: movie.fields.overview,
+                release_date: movie.fields.release_date,
+                popularity: movie.fields.popularity,
+                vote_average: movie.fields.vote_average,
+                original_language: movie.fields.original_language,
+                original_title: movie.fields.original_title,
+                genre_ids: movie.fields.genre_ids,
+                backdrop_path: movie.fields.backdrop_path,
+                poster_path: movie.fields.poster_path,
+                video: movie.fields.video,
+                vote_count: movie.fields.vote_count,
+                adult: movie.fields.adult
+                // Add any other properties you wish to send
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error sending movie data:', error);
+        });
+    }
+
+
+    // Function to handle Like and Dislike button clicks
+    function handleLikeDislikeClick(liked) {
+        console.log('Like/Dislike button clicked:', liked ? 'Liked' : 'Disliked');
+
+        if (winningMovieData) {
+            console.log('Selected movie for action:', winningMovieData);
+            sendMovieData(winningMovieData, liked)
+                .then(data => {
+                    console.log('Response from server:', data);
+                    updateMoviesData(data.updated_movies);
+                    closeModal();
+                })
+                .catch(err => console.error('Error:', err));
+        } else {
+            console.log('No movie selected');
+        }
+    }
+
+
+    // Function to update movies data and redraw the wheel
+    function updateMoviesData(updatedMoviesJson) {
+        var moviesElement = document.getElementById('movies-data');
+        if (moviesElement) {
+            moviesElement.textContent = updatedMoviesJson;
+            var updatedMovies = JSON.parse(updatedMoviesJson);
+
+            wheelImages = []; // Clear existing images
+            loadWheelImages(updatedMovies, function() {
+                drawWheel(document.getElementById('movieWheelCanvas'), 0);
+            });
+        }
+    }
+
+
+    // Function to close the modal
+    function closeModal() {
+        $('#exampleModalCenter').modal('hide'); // Using jQuery to hide the modal
+    }
+
+
+    // Attach event listeners to Liked and Disliked buttons
+    const likedButton = document.querySelector('.btn-primary.Liked');
+    const dislikedButton = document.querySelector('.btn-primary.Disliked');
+
+    if (likedButton && dislikedButton) {
+        likedButton.addEventListener('click', function() {
+            handleLikeDislikeClick(true);
+        });
+
+        dislikedButton.addEventListener('click', function() {
+            handleLikeDislikeClick(false);
+        });
+
+        console.log('Event listeners attached to buttons');  // Log that event listeners are attached
+    } else {
+        console.log('Like/Dislike buttons not found');  // Log if buttons are not found
+    }
 </script>
 
-
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button class="btn-close" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-danger light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-primary Disliked">Disliked</button>
+                <button type="button" class="btn btn-sm btn-primary Liked">Liked</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

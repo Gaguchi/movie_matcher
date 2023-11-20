@@ -4713,13 +4713,16 @@ textarea.form-control-lg {
   display: flex;
   flex-shrink: 0;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-end;
   padding: calc(var(--bs-modal-padding) - var(--bs-modal-footer-gap) * .5);
   background-color: var(--bs-modal-footer-bg);
   border-top: var(--bs-modal-footer-border-width) solid var(--bs-modal-footer-border-color);
   border-bottom-right-radius: var(--bs-modal-inner-border-radius);
-  border-bottom-left-radius: var(--bs-modal-inner-border-radius); }
+  border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+  flex-wrap: wrap;
+  flex-direction: column;
+ }
   .modal-footer > * {
     margin: calc(var(--bs-modal-footer-gap) * .5); }
 
@@ -18681,23 +18684,23 @@ svg.radial-progress {
       text-align: center;
       font-size: 2.2rem;
       line-height: var(--slider-height)-20.5rem; }
-    .dzSwipe_card__option {
-      position: absolute;
-      left: 15px;
-      top: 15px;
-      width: 50px;
-      height: 50px;
-      opacity: 0;
-      font-size: 26px;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center; }
+      .dzSwipe_card__option {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        height: 150px; 
+        opacity: 0;
+        font-size: 50px;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
       .dzSwipe_card__option.dzReject {
-        background: #FF945A;
-        left: auto;
-        right: 15px; }
+        background: #da1313; }
       .dzSwipe_card__option.dzLike {
         background: #B1DA96; }
         .dzSwipe_card__option.dzLike:after {

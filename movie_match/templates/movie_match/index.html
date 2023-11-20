@@ -273,7 +273,6 @@ const handleMove = throttle((e) => {
     {% else %}
     <script type="text/babel">
         // Redirect user to login page if not authenticated
-        window.location.href = "{% url 'login' %}?message=To use Movie Matcher, you need to be logged in.";
     </script>
     {% endif %}
     {% block scripts %}
