@@ -2,6 +2,7 @@
 {% load static %} <!-- Replace with your base template -->
 
 {% block content %}
+{% if user.is_authenticated %}
 	<!-- Page Content Start -->
 	<div class="page-content space-top p-b65">
 		<div class="container fixed-full-area">
@@ -356,4 +357,26 @@
 	</div>
 	<!-- Page Content End -->
     
+    {% else %}
+        <!-- Page Content for Unauthenticated Users -->
+        <div class="page-content space-top p-b65">
+            <div class="container fixed-full-area">
+                <h2>Please log in</h2>
+                <div id="login-form" style="display: block;">
+                    <!-- Existing login form -->
+                    <form action="{% url 'login' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="password" name="password" placeholder="Password">
+                        </div>
+                        <input class="btn btn-primary" type="submit" value="Login">
+                    </form>
+                    Don't have an account? <a href="{% url 'register' %}" class="fw-bold">Register here.</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

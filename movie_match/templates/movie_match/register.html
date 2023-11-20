@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <!-- Add your styles and scripts here -->
-</head>
-<body>
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
+{% extends 'home/Layout_v2.html' %}
+{% load static %} <!-- Replace with your base template -->
+
+{% block content %}
+<div class="page-content space-top p-b65">
+    <div class="container fixed-full-area">
+        <h2>Registration</h2>
     <div id="register-form">
     <!-- New registration form -->
     <form action="{% url 'register' %}" method="post">
@@ -27,7 +23,8 @@
         </div>
         <input class="btn btn-primary" type="submit" value="Register">
     </form>
-    Already have an account? <a href="{% url 'login' %}">Login here.</a>
+    Already have an account? <a href="{% url 'login' %}" class="fw-bold">Login here.</a>
 </div>
-</body>
-</html>
+</div>
+</div>
+{% endblock %}

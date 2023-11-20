@@ -12062,7 +12062,8 @@ section {
     border-top: 1px solid var(--border-color); }
     .menubar-area.style-3 .menubar-nav {
       display: flex;
-      width: 100%; }
+      width: 100%; 
+      justify-content: space-evenly;}
       .menubar-area.style-3 .menubar-nav .nav-link {
         color: #A6A9B8; }
         .menubar-area.style-3 .menubar-nav .nav-link:after {
@@ -14594,7 +14595,7 @@ button {
 .dz-media-card {
   position: relative; }
   .dz-media-card .dz-media {
-    height: 220px;
+    height: 450px;
     border-radius: var(--border-radius); }
     .dz-media-card .dz-media img {
       height: 100%;

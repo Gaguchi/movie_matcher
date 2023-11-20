@@ -18,17 +18,15 @@ def login_view(request):
 
         if user is not None:
             login(request, user)  # Log the user in
-            return HttpResponseRedirect(reverse("movie_match:index"))
+            return render(request, "home/index.html")
         else:
-            return render(request, "movie_match/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(request, "home/index.html")
     else:
-        return render(request, "movie_match/login.html")
+        return render(request, "home/index.html")
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return render(request, "home/index.html")
 
 def register(request):
     if request.method == "POST":
