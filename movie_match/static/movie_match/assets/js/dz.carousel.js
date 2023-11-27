@@ -1,13 +1,3 @@
-/** 	=========================
-	Template Name 	 : Dating Kit
-	Author			 : DexignZone
-	Version			 : 1.0
-	File Name		 : custom.js
-	Author Portfolio : https://themeforest.net/user/dexignzone/portfolio
-
-	Core script to handle the entire theme and core functions
-**/
-
 /* JavaScript Document */
 jQuery(document).ready(function() {
     'use strict';

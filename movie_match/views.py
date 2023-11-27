@@ -82,4 +82,4 @@ def wheel_of_movies(request):
     })
 
 def index(request):
-    return render(request, "movie_match/index.html")
+    return render(request, "home/index.html")

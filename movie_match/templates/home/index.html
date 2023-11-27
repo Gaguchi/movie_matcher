@@ -8,7 +8,6 @@
 		<div class="container fixed-full-area">
 			<div id="root" class="dzSwipe_card-cont dz-gallery-slider" style="display:contents">
     <script type="text/javascript">
-
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof initReactApp === 'function') {
                 initReactApp();
@@ -56,8 +55,12 @@
 							<h4 class="title"><a href="profile-detail.html">{movie.title}</a></h4>
 							<p><i class="icon feather icon-map-pin"></i>Vote Average: {movie.vote_average}</p>		
                             <div class="meta-btn">
-                                <a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100" onClick={() => onDislikedClick(movie)}>Seen: Disliked<i class="feather icon-x"></i></a>
-                                <a href="javascript:void(0);" class="btn btn-info rounded-xl w-100" onClick={() => onLikedClick(movie)}>Seen: Liked<i class="feather icon-heart-on"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100" onClick={() => onDislikedClick(movie)}>
+                                    Seen: Disliked<i class="feather icon-x"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-info rounded-xl w-100" onClick={() => onLikedClick(movie)}>
+                                    Seen: Liked<i class="feather icon-heart-on"></i>
+                                </a>
                             </div>			
 						</div>
 					</div>
@@ -87,16 +90,12 @@
                 const [lastFetchTime, setLastFetchTime] = useState(0);
 
                 const handleLikedClick = (movie) => {
-                    setSeenLiked(true);
-                    setSeenDisliked(false);
-                    sendSwipeDataToServer(movie, true, false, true, false);
+                    sendSwipeDataToServer(movie, false, false, true, false);
                     moveToNextMovie();
                 };
                 
                 const handleDislikedClick = (movie) => {
-                    setSeenLiked(false);
-                    setSeenDisliked(true);
-                    sendSwipeDataToServer(movie, false, true, false, true);
+                    sendSwipeDataToServer(movie, false, false, false, true);
                     moveToNextMovie();
                 };
             
@@ -174,7 +173,7 @@
                     fetch(`/movie_match/save_movie_data/${movie.id}/`, {
                       method: 'POST',
                       headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                       },
                       body: JSON.stringify({
                         isInterested,

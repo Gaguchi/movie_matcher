@@ -68,8 +68,6 @@ def register(request):
         return render(request, "movie_match/register.html")
 
 def index(request):
-    # Assuming 'home' is a directory inside your 'templates' directory
-    # and 'index.html' is the template you want to render
     return render(request, "home/index.html")
 
 

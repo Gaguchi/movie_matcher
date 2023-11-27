@@ -4,20 +4,11 @@
 <head>
 	
 	<!-- Title -->
-	<title>Dating Kit - Dating Mobile App Template ( Bootstrap + PWA )</title>
+	<title>Movie Matcher</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, minimal-ui, viewport-fit=cover">
-	<meta name="theme-color" content="#FF50A2">
-	<meta name="author" content="DexignZone">
-	<meta name="robots" content="index, follow"> 
-	<meta name="keywords" content="android, ios, mobile, application template, progressive web app, ui kit, multiple color, dark layout, match, partner, perfect match, dating app, dating, couples, dating kit, mobile app">
-	<meta name="description" content="Transform your dating app vision into reality with our 'Dating Kit' - a powerful Bootstrap template for mobile dating applications. Seamlessly integrate captivating features, stylish UI components, and user-friendly functionality. Launch your dating app efficiently and elegantly using the Dating Kit template.">
-	<meta property="og:title" content="Dating Kit - Dating Mobile App Template ( Bootstrap + PWA )">
-	<meta property="og:description" content="Transform your dating app vision into reality with our 'Dating Kit' - a powerful Bootstrap template for mobile dating applications. Seamlessly integrate captivating features, stylish UI components, and user-friendly functionality. Launch your dating app efficiently and elegantly using the Dating Kit template.">
-	<meta property="og:image" content="https://datingkit.dexignzone.com/xhtml/social-image.png">
-	<meta name="format-detection" content="telephone=no">
 
 	<!-- Favicons Icon -->
 	<link rel="shortcut icon" type="image/x-icon" href="{% static 'movie_match/assets/images/favicon.png">
@@ -28,6 +19,7 @@
 	<link rel="stylesheet" href="{% static 'movie_match/assets/vendor/swiper/swiper-bundle.min.css' %}">
     
 	<!-- Stylesheets -->
+    <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/bootstrap.css' %}">
     <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/style.css' %}">
 	
     <!-- Google Fonts -->
@@ -66,11 +58,14 @@
 							<img src="{% static 'movie_match/assets/images/MovieMatcher.png' %}" alt="">
 						</a>
 					</div>
+					{% if user.is_authenticated %}
 					<div class="right-content dz-meta">
 						<a href="{% url 'profile' user.username %}" class="filter-icon">
 							<i class="fa-solid fa-user"></i>
 						</a>
 					</div>
+					{% else %}
+					{% endif %}
 				</div>
 			</div>
 		</header>
@@ -85,8 +80,8 @@
 					<img src="{% static 'movie_match/assets/images/user/pic1.jpg' %}" alt="author-image">
 				</div>
 				<div class="dz-info">
-					<h5 class="name">John Doe</h5>
-					<span>example@gmail.com</span>
+					<h5 class="name">{{ user.username }}</h5>
+					<span>{{ user.email }}</span>
 				</div>
 			</a>
 			<ul class="nav navbar-nav">	
@@ -107,12 +102,15 @@
 					</a>
 				</li>
 				<li>
+					{% if user.is_authenticated %}
 					<a class="nav-link" href="{% url 'profile' user.username %}">
 						<span class="dz-icon">
 							<i class="fa-solid fa-user"></i>
 						</span>
 						<span>Profile</span>
 					</a>
+					{% else %}
+					{% endif %}
 				</li>
 				<li>
 					<a class="nav-link" href="{% url 'logout' %}">
@@ -142,9 +140,12 @@
 			<a href="{% url 'movie_match:wheel_of_movies' %}" class="nav-link">
 				<i class="fa-solid fa-dharmachakra"></i>
 			</a>
+			{% if user.is_authenticated %}
 			<a href="{% url 'profile' user.username %}" class="nav-link">
 				<i class="fa-solid fa-user"></i>
 			</a>
+			{% else %}
+			{% endif %}
 		</div>
 	</div>
 	<!-- Menubar -->
@@ -155,11 +156,8 @@
 <script src="{% static 'movie_match/assets/js/jquery.js' %}"></script>
 <script src="{% static 'movie_match/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'movie_match/assets/vendor/swiper/swiper-bundle.min.js' %}"></script><!-- Swiper -->
-<script src="https://datingkit.dexignzone.com/xhtml/assets/vendor/countdown/jquery.countdown.js' %}"></script><!-- COUNTDOWN FUCTIONS  -->
 <script src="{% static 'movie_match/assets/vendor/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js' %}"></script><!-- Swiper -->
-<script src="{% static 'movie_match/assets/js/tinderSwiper.min.js' %}"></script>
-<script src="{% static 'movie_match/assets/js/dz.carousel.js' %}"></script><!-- Swiper -->
-<script src="{% static 'movie_match/assets/js/settings.js' %}"></script>
+<script src="{% static 'movie_match/assets/js/dz.carousel.js' %}"></script>
 <script src="{% static 'movie_match/assets/js/custom.js' %}"></script>
 </body>
 </html>
