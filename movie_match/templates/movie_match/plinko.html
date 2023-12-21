@@ -5,7 +5,7 @@
 <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/Plinko.css' %}">
 <!-- Page Content Start -->
 <div class="canvas-container">
-    <canvas id="moviePlinkoCanvas" width="370" height="500"></canvas>
+    <canvas id="moviePlinkoCanvas" width="340" height="500"></canvas>
     <!-- Hidden element to store movies data -->
     <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
 
@@ -16,7 +16,12 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var canvas = document.getElementById('moviePlinkoCanvas');
-        
+
+        // Scale the canvas to match its actual size
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
         // Initialize the Plinko game
         const plinko = new Plinko(canvas);
         plinko.loop();
