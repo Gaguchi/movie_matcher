@@ -8,14 +8,26 @@
     <canvas id="moviePlinkoCanvas" width="340" height="500"></canvas>
     <!-- Hidden element to store movies data -->
     <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
-
 </div>
 <!-- Page Content End -->
+
+<!-- Sliders -->
+<div>
+    <label for="imgWidth">Image Width:</label>
+    <input type="range" id="imgWidth" name="imgWidth" min="1" max="100" value="42.5">
+    <label for="imgHeight">Image Height:</label>
+    <input type="range" id="imgHeight" name="imgHeight" min="1" max="500" value="100">
+    <label for="imgX">Image X:</label>
+    <input type="range" id="imgX" name="imgX" min="-340" max="340" value="0">
+    <label for="imgY">Image Y:</label>
+    <input type="range" id="imgY" name="imgY" min="-5000" max="500" value="0">
+</div>
 
 <script src="{% static 'movie_match/assets/js/plinko.js' %}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var canvas = document.getElementById('moviePlinkoCanvas');
+        var movies = JSON.parse(document.getElementById('movies-data').textContent);
 
         // Scale the canvas to match its actual size
         const rect = canvas.getBoundingClientRect();
@@ -23,11 +35,25 @@
         canvas.height = rect.height;
 
         // Initialize the Plinko game
-        const plinko = new Plinko(canvas);
+        const plinko = new Plinko(canvas, movies);
         plinko.loop();
 
         canvas.addEventListener('click', (event) => {
             plinko.addBall(event.clientX, event.clientY);
+        });
+
+        // Update image dimensions and position when sliders change
+        document.getElementById('imgWidth').addEventListener('change', function() {
+            plinko.imgWidth = this.value;
+        });
+        document.getElementById('imgHeight').addEventListener('change', function() {
+            plinko.imgHeight = this.value;
+        });
+        document.getElementById('imgX').addEventListener('change', function() {
+            plinko.imgX = this.value;
+        });
+        document.getElementById('imgY').addEventListener('change', function() {
+            plinko.imgY = this.value;
         });
     });
 </script>

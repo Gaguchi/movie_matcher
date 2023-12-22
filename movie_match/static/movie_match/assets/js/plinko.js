@@ -24,6 +24,7 @@ class Ball {
         this.gravity = 0.2;  // Increase gravity
         this.friction = 0.98;  // Increase friction
         this.bounciness = 0.9;  // Decrease bounciness
+        this.hitBottom = false;  // Add this line
     }
 
     update() {
@@ -54,35 +55,33 @@ class Ball {
 }
 
 class Plinko {
-    constructor(canvas) {
+    constructor(canvas, movies) {  // Add movies parameter here
         console.log('Initializing Plinko game');  // Debugging log
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.pegs = [];
         this.balls = [];
         this.sections = 8;  // Number of sections
+        this.movies = movies;  // Add this line
+        this.logged = false;  // Add this line
         this.createPegs();
+
+        // Load the image
+        this.img = new Image();
+        if (Array.isArray(this.movies) && this.movies.length > 0) {
+            this.img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[0].fields.poster_path;
+        }
     }
 
     drawWalls() {
-        const lineY = this.canvas.height - 50;
-        const sectionWidth = this.canvas.width / this.sections;
+        // Check if the image has loaded
+        if (this.img.complete) {
+            // Draw the image inside the rectangle
+            this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, 150, 150);
 
-        this.ctx.fillStyle = '#000';  // Set the fill color to black
-        this.ctx.textBaseline = 'middle';
-        this.ctx.font = '20px Arial';
-
-        for (let i = 0; i <= this.sections; i++) {
-            // Draw the line
-            this.ctx.beginPath();
-            this.ctx.moveTo(i * sectionWidth, lineY);
-            this.ctx.lineTo(i * sectionWidth, this.canvas.height);
-            this.ctx.stroke();
-
-            // Draw the number
-            if (i < this.sections) {
-                this.ctx.fillText(i + 1, i * sectionWidth + sectionWidth / 2, this.canvas.height - 25);
-            }
+            // Draw a blue rectangle on top of the image
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';  // Semi-transparent blue
+            this.ctx.fillRect(0, 0, 150, 150);
         }
     }
 
@@ -105,7 +104,6 @@ class Plinko {
     }
 
     addBall(x, y) {
-        console.log(`Adding ball at position (${x}, ${y})`);  // Debugging log
         this.balls.push(new Ball(x, y));
     }
 
@@ -154,12 +152,15 @@ class Plinko {
             }
 
             // Check if the ball has reached the bottom of the canvas
-            if (ball.y + ball.radius > this.canvas.height - 50) {
+            if (!ball.hitBottom && ball.y + ball.radius > this.canvas.height - 50) {
                 // Calculate which section the ball is in
                 const section = Math.floor(ball.x / sectionWidth);
-
+    
                 // Log the section number to the console
                 console.log('Ball in section:', section + 1);
+    
+                // Mark the ball as having hit the bottom
+                ball.hitBottom = true;
             }
             // Check collision with lines
             for (let i = 1; i < this.sections; i++) {
@@ -171,20 +172,22 @@ class Plinko {
     }
 
     draw() {
-        console.log(`Drawing ${this.pegs.length} pegs and ${this.balls.length} balls`);  // Debugging log
+        // Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.drawWalls();  // Draw the walls
-
-        for (const peg of this.pegs) {
-            peg.draw(this.ctx);
+        // Draw the pegs
+        for (let i = 0; i < this.pegs.length; i++) {
+            this.pegs[i].draw(this.ctx);
         }
 
-        for (const ball of this.balls) {
-            ball.draw(this.ctx);
+        // Draw the balls
+        for (let i = 0; i < this.balls.length; i++) {
+            this.balls[i].draw(this.ctx);
         }
+
+        // Draw the walls
+        this.drawWalls();  // Move this line to the end
     }
-
     loop() {
         this.update();
         this.draw();
