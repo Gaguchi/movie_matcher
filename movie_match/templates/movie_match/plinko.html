@@ -15,12 +15,16 @@
 <div>
     <label for="imgWidth">Image Width:</label>
     <input type="range" id="imgWidth" name="imgWidth" min="1" max="100" value="42.5">
+    <span id="imgWidthValue"></span>
     <label for="imgHeight">Image Height:</label>
     <input type="range" id="imgHeight" name="imgHeight" min="1" max="500" value="100">
+    <span id="imgHeightValue"></span>
     <label for="imgX">Image X:</label>
-    <input type="range" id="imgX" name="imgX" min="-340" max="340" value="0">
+    <input type="range" id="imgX" name="imgX" min="0" max="340" value="0">
+    <span id="imgXValue"></span>
     <label for="imgY">Image Y:</label>
-    <input type="range" id="imgY" name="imgY" min="-5000" max="500" value="0">
+    <input type="range" id="imgY" name="imgY" min="0" max="500" value="0">
+    <span id="imgYValue"></span>
 </div>
 
 <script src="{% static 'movie_match/assets/js/plinko.js' %}"></script>
@@ -42,18 +46,22 @@
             plinko.addBall(event.clientX, event.clientY);
         });
 
-        // Update image dimensions and position when sliders change
-        document.getElementById('imgWidth').addEventListener('change', function() {
-            plinko.imgWidth = this.value;
+        // Add event listeners to the sliders
+        document.getElementById('imgWidth').addEventListener('input', function(event) {
+            plinko.sectionWidth = event.target.value;
+            document.getElementById('imgWidthValue').textContent = event.target.value;
         });
-        document.getElementById('imgHeight').addEventListener('change', function() {
-            plinko.imgHeight = this.value;
+        document.getElementById('imgHeight').addEventListener('input', function(event) {
+            plinko.sectionHeight = event.target.value;
+            document.getElementById('imgHeightValue').textContent = event.target.value;
         });
-        document.getElementById('imgX').addEventListener('change', function() {
-            plinko.imgX = this.value;
+        document.getElementById('imgX').addEventListener('input', function(event) {
+            plinko.sectionX = event.target.value;
+            document.getElementById('imgXValue').textContent = event.target.value;
         });
-        document.getElementById('imgY').addEventListener('change', function() {
-            plinko.imgY = this.value;
+        document.getElementById('imgY').addEventListener('input', function(event) {
+            plinko.sectionY = event.target.value;
+            document.getElementById('imgYValue').textContent = event.target.value;
         });
     });
 </script>

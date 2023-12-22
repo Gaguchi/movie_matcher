@@ -61,32 +61,43 @@ class Plinko {
         this.ctx = canvas.getContext('2d');
         this.pegs = [];
         this.balls = [];
-        this.sections = 8;  // Number of sections
+        this.sections = 5;  // Number of sections
         this.movies = movies;  // Add this line
         this.logged = false;  // Add this line
         this.createPegs();
+        this.sectionWidth = 68 ;  // Initial section width
+        this.sectionHeight = 102 ;  // Initial section height
+        this.sectionX = 0;  // Initial x position
+        this.sectionY = 399;  // Initial y position
 
         // Load the image
-        this.img = new Image();
-        if (Array.isArray(this.movies) && this.movies.length > 0) {
-            this.img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[0].fields.poster_path;
+        this.images = [];
+        if (Array.isArray(this.movies)) {
+            for (let i = 0; i < this.movies.length; i++) {
+                const img = new Image();
+                img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[i].fields.poster_path;
+                this.images.push(img);
+            }
         }
     }
 
     drawWalls() {
-        // Check if the image has loaded
-        if (this.img.complete) {
-            // Draw the image inside the rectangle
-            this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, 150, 150);
+        // Draw the images
+        for (let i = 0; i < this.sections; i++) {
+            // Check if an image exists and has loaded
+            if (i < this.images.length && this.images[i].complete) {
+                // Draw the image in the section
+                this.ctx.drawImage(this.images[i], this.sectionX + i * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight);
 
-            // Draw a blue rectangle on top of the image
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';  // Semi-transparent blue
-            this.ctx.fillRect(0, 0, 150, 150);
+                // Draw a semi-transparent rectangle on top of the image
+                this.ctx.fillStyle = 'rgba(0, 0, 255, 0)';  // Semi-transparent blue
+                this.ctx.fillRect(this.sectionX + i * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight);
+            }
         }
     }
 
     createPegs() {
-        const rows = 15;
+        const rows = 12;
         const cols = 11;
         const spacing = 30;
         const offsetX = 0;  // Add an offset to the x position of the pegs
