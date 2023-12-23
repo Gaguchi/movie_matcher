@@ -180,6 +180,16 @@ class Plinko {
                     ball.vx *= -1;
                 }
             }
+            // Update the balls
+            for (let i = 0; i < this.balls.length; i++) {
+                this.balls[i].update();
+        
+                // Check if the ball has reached the bottom of the canvas
+                if (this.balls[i].y + this.balls[i].radius >= this.canvas.height) {
+                    // Determine the winning section
+                    this.determineWinningSection(this.balls[i]);
+                }
+            }
         }
     }
 
