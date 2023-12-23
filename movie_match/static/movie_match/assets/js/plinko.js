@@ -188,6 +188,12 @@ class Plinko {
                 if (this.balls[i].y + this.balls[i].radius >= this.canvas.height) {
                     // Determine the winning section
                     this.determineWinningSection(this.balls[i]);
+        
+                    // Remove the ball from the array
+                    this.balls.splice(i, 1);
+        
+                    // Decrement i to account for the removed ball
+                    i--;
                 }
             }
         }
@@ -216,10 +222,16 @@ class Plinko {
         requestAnimationFrame(() => this.loop());
     }
 
-    determineWinningSection() {
+    determineWinningSection(ball) {
+        // Check if the ball is undefined
+        if (!ball) {
+            console.error('determineWinningSection was called with an undefined ball');
+            return;
+        }
+
         // Determine the winning section
         const sectionWidth = this.canvas.width / this.sections;
-        const winningSection = Math.floor(this.ball.x / sectionWidth);
+        const winningSection = Math.floor(ball.x / sectionWidth);
 
         // Get the winning movie
         const winningMovie = this.movies[winningSection];
