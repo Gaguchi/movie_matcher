@@ -17,7 +17,7 @@ class Peg {
 class Ball {
     constructor(x, y) {
         this.x = x;
-        this.y = y;
+        this.y = 70;
         this.radius = 5;
         this.vx = 0;
         this.vy = 0;
@@ -101,11 +101,12 @@ class Plinko {
         const cols = 11;
         const spacing = 30;
         const offsetX = 0;  // Add an offset to the x position of the pegs
-
+        const offsetY = 10;  // Add an offset to the y position of the pegs
+    
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 let x = col * spacing + spacing / 2 + offsetX;  // Add the offset here
-                const y = row * spacing + spacing / 2;
+                let y = row * spacing + spacing / 2 + offsetY;  // Add the offset here
                 if (row % 2 === 0) {
                     x += spacing / 2;
                 }
