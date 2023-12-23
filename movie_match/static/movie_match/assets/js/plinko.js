@@ -205,6 +205,19 @@ class Plinko {
         this.draw();
         requestAnimationFrame(() => this.loop());
     }
+
+    determineWinningSection() {
+        // Determine the winning section
+        const sectionWidth = this.canvas.width / this.sections;
+        const winningSection = Math.floor(this.ball.x / sectionWidth);
+
+        // Get the winning movie
+        const winningMovie = this.movies[winningSection];
+
+        // Log the winning section and movie
+        console.log('Winning section:', winningSection);
+        console.log('Winning movie:', winningMovie.fields.title);
+    }
 }
 
 const canvas = document.querySelector('canvas');
