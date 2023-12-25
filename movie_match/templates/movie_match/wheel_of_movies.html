@@ -164,23 +164,29 @@
 </script>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModalCenter">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+
+  
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
-                <button class="btn-close" data-bs-dismiss="modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Movie Title</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <img src="" alt="Movie Poster" class="modal-image">
-                <p>Movie overview</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="" alt="Movie Poster" class="img-fluid rounded modal-image">
+                    </div>
+                    <div class="col-md-8">
+                        <p class="lead">Movie overview</p>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-danger light" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-sm btn-primary Disliked">Disliked</button>
-                <button type="button" class="btn btn-sm btn-primary Liked">Liked</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger Disliked">Disliked</button>
+                <button type="button" class="btn btn-success Liked">Liked</button>
             </div>
         </div>
     </div>

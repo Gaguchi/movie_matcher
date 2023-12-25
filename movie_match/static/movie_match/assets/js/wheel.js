@@ -149,8 +149,8 @@ function calculateWinner(angle, numberOfSegments, movies) {
 
         // Update and show the modal with winning movie details
         var modal = document.getElementById('exampleModalCenter');
-        modal.querySelector('.modal-title').textContent = 'Winning Movie';
-        modal.querySelector('.modal-body p').textContent = winningMovie.fields.title;
+        modal.querySelector('.modal-title').textContent = winningMovie.fields.title;
+        modal.querySelector('.lead').textContent = winningMovie.fields.overview;
         modal.querySelector('.modal-image').src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + winningMovie.fields.poster_path;
         var modalInstance = new bootstrap.Modal(modal);
         modalInstance.show();
