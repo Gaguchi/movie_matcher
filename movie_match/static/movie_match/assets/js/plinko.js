@@ -1,4 +1,6 @@
 
+var winningMovieData = null;
+
 class Peg {
     constructor(x, y) {
         this.x = x;
@@ -94,6 +96,43 @@ class Plinko {
                 this.ctx.fillRect(this.sectionX + i * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight);
             }
         }
+    }
+    
+    redrawSections(newMovies) {
+        // Update the movies
+        this.movies = newMovies;
+
+        // Update the images
+        this.images = [];
+        for (let i = 0; i < this.movies.length; i++) {
+            // Check if the movie object and its fields property are defined
+            if (this.movies[i] && this.movies[i].fields) {
+                const img = new Image();
+                img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[i].fields.poster_path;
+                img.onload = () => this.drawWalls();  // Redraw the sections when the image has loaded
+                this.images.push(img);
+            }
+        }
+
+        // Clear the canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Redraw the sections
+        this.drawWalls();
+
+        // Redraw the pegs
+        for (let i = 0; i < this.pegs.length; i++) {
+            this.pegs[i].draw(this.ctx);
+        }
+
+        // Redraw the balls
+        for (let i = 0; i < this.balls.length; i++) {
+            this.balls[i].draw(this.ctx);
+        }
+    }
+
+    updateMoviesData() {
+        this.redrawSections();
     }
 
     createPegs() {
@@ -236,9 +275,24 @@ class Plinko {
         // Get the winning movie
         const winningMovie = this.movies[winningSection];
 
-        // Log the winning section and movie
-        console.log('Winning section:', winningSection);
-        console.log('Winning movie:', winningMovie.fields.title);
+        // Check if the winning movie is defined
+        if (winningMovie) {
+            winningMovieData = winningMovie
+
+            // Log the winning section and movie
+            console.log('Winning section:', winningSection);
+            console.log('Winning movie:', winningMovie.fields.title);
+            var modal = document.getElementById('exampleModalCenter');
+            modal.querySelector('.modal-title').textContent = winningMovie.fields.title;
+            modal.querySelector('.lead').textContent = winningMovie.fields.overview;
+            modal.querySelector('.text-muted').textContent = winningMovie.fields.release_date;
+            modal.querySelector('.modal-image').src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + winningMovie.fields.poster_path;
+            modal.querySelector('.modal-content').style.background = 'url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces' + winningMovie.fields.backdrop_path +')';
+            var modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        } else {
+            console.error('No movie data for section:', winningSection);
+        }
     }
 }
 

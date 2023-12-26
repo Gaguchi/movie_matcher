@@ -84,7 +84,7 @@ def wheel_of_movies(request):
 @login_required
 def plinko(request):
     user = request.user
-    interested_movies_qs = user.movies_interested.all()[:8]
+    interested_movies_qs = user.movies_interested.all()[:5]
     # Serializing the queryset to JSON format
     interested_movies = serializers.serialize('json', interested_movies_qs)
     return render(request, "movie_match/plinko.html", {
