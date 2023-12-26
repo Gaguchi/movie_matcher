@@ -151,7 +151,9 @@ function calculateWinner(angle, numberOfSegments, movies) {
         var modal = document.getElementById('exampleModalCenter');
         modal.querySelector('.modal-title').textContent = winningMovie.fields.title;
         modal.querySelector('.lead').textContent = winningMovie.fields.overview;
+        modal.querySelector('.text-muted').textContent = winningMovie.fields.release_date;
         modal.querySelector('.modal-image').src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + winningMovie.fields.poster_path;
+        modal.querySelector('.modal-content').style.background = 'url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces' + winningMovie.fields.backdrop_path +')';
         var modalInstance = new bootstrap.Modal(modal);
         modalInstance.show();
     } else {

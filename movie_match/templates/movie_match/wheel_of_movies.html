@@ -3,6 +3,7 @@
 
 {% block content %}
 <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/wheel.css' %}">
+<link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/modal.css' %}">
 <!-- Page Content Start -->
 <div class="canvas-container">
     <canvas id="movieWheelCanvas" width="500" height="500"></canvas>
@@ -164,29 +165,32 @@
 </script>
 
 <!-- Modal -->
-
   
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Movie Title</h5>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <img src="" alt="Movie Poster" class="img-fluid rounded modal-image">
-                    </div>
-                    <div class="col-md-8">
-                        <p class="lead">Movie overview</p>
+            <div class="row g-0 flex-column width-half">
+                <div class="col-md-4 order-md-1 width-full">
+                    <div class="custom-row">
+                        <div class="custom-col">
+                            <img src="" alt="Movie Poster" class="img-fluid rounded modal-image">
+                        </div>
+                        <div class="custom-col">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Movie Title</h5>
+                            <p class="card-text"><small class="text-muted">2017, David Ayer</small></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger Disliked">Disliked</button>
-                <button type="button" class="btn btn-success Liked">Liked</button>
+                <div class="col-md-8 order-md-2 width-full">
+                    <div class="card-body">
+                        <p class="lead">Movie overview</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger Disliked">Disliked</button>
+                        <button type="button" class="btn btn-success Liked">Liked</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
