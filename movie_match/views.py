@@ -85,10 +85,12 @@ def wheel_of_movies(request):
 def plinko(request):
     user = request.user
     interested_movies_qs = user.movies_interested.all()[:5]
+    interested_movies_length = len(interested_movies_qs)  # Get the length of the queryset
     # Serializing the queryset to JSON format
     interested_movies = serializers.serialize('json', interested_movies_qs)
     return render(request, "movie_match/plinko.html", {
-        "interested_movies_json": interested_movies  # Pass the serialized JSON to the template
+        'interested_movies_json': interested_movies,
+        'interested_movies_length': interested_movies_length,
     })
 
 def index(request):

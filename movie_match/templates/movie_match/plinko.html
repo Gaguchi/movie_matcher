@@ -6,9 +6,13 @@
 <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/modal.css' %}">
 <!-- Page Content Start -->
 <div class="canvas-container">
-    <canvas id="moviePlinkoCanvas" width="340" height="500"></canvas>
-    <!-- Hidden element to store movies data -->
-    <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
+    {% if interested_movies_length >= 8 %}
+        <canvas id="moviePlinkoCanvas" width="340" height="500"></canvas>
+        <!-- Hidden element to store movies data -->
+        <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
+    {% else %}
+        <p>You need at least 8 movies to play the game. Please add more movies.</p>
+    {% endif %}
 </div>
 <!-- Page Content End -->
 
