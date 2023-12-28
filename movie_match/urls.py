@@ -10,4 +10,5 @@ urlpatterns = [
     path('wheel/', movie_match_views.wheel_of_movies, name='wheel_of_movies'),
     path('plinko/', movie_match_views.plinko, name='plinko'),
     path('login/', main_views.login_view, name='login'),
+    path('movie_profile/<int:movie_id>/', movie_match_views.movie_profile, name='movie_profile'),
 ]

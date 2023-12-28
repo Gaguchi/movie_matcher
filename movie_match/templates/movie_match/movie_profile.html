@@ -1,0 +1,81 @@
+{% extends 'home/layout_v2.html' %} <!-- Replace with your base template -->
+
+{% block content %}
+<!-- Page Content Start -->
+<div class="page-content p-t100 p-b50">
+    <div class="container">
+        <!-- Movie Showcase -->
+        <div id="movie-showcase"></div> <!-- React app will mount here -->
+    </div>
+</div>
+<!-- Page Content End -->
+
+<!-- Include the React and ReactDOM libraries -->
+<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+<!-- Include Babel for JSX transpilation -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- Write your React code -->
+{% verbatim %}
+<script type="text/babel">
+    function MovieShowcase({ movieId }) {
+        const [movie, setMovie] = React.useState(null);
+        const isMounted = React.useRef(true);
+
+        React.useEffect(() => {
+            const options = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMTg3OWI0OTI1MTE2NzBmMDNmNWI1Y2M5ZWI2ZTQzNSIsInN1YiI6IjY1MzAwNDA5OWQ1OTJjMDBhZTlmMjdkMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RYPMM01Ei_X917bnfjd4M353M2nXYsioz1RPhS1Zoxo'
+                }
+            };
+
+            fetch(`https://api.themoviedb.org/3/movie/${movieId}?language=en-US`, options)
+                .then(response => response.json())
+                .then(data => {
+                    if (isMounted.current) {
+                        setMovie(data);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            return () => {
+                isMounted.current = false;
+            };
+        }, [movieId]);
+
+        if (!movie) {
+            return <div>Loading...</div>;
+        }
+        
+        document.body.style.backgroundImage = `url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${movie.backdrop_path})`;
+        document.body.classList.remove('overflow-hidden');
+
+        return (
+            <div className="movie-showcase">
+                <a href={movie.poster_path} target="_blank">
+                    <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}`} alt={movie.title} className="img-fluid" style={{maxWidth: '300px'}} />
+                </a>
+                <div className="movie-info" style={{backgroundColor: 'rgba(0, 0, 0, 0.7)', color: 'white', padding: '20px'}}>
+                    <h2 className="movie-title">{movie.title}</h2>
+                    <p className="movie-release-date">Release Date: {movie.release_date}</p>
+                    <p className="movie-overview">{movie.overview}</p>
+                    {/* Add more movie info here */}
+                </div>
+            </div>
+        );
+    }
+{% endverbatim %}
+    // Get the movie ID from the Django template variable
+    const movieId = parseInt('{{ movie_id }}');
+{% verbatim %}
+    ReactDOM.render(
+        <MovieShowcase movieId={movieId} />,
+        document.getElementById('movie-showcase')
+    );
+</script>
+{% endverbatim %}
+{% endblock %}

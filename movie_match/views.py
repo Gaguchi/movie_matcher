@@ -95,3 +95,6 @@ def plinko(request):
 
 def index(request):
     return render(request, "home/index.html")
+
+def movie_profile(request, movie_id):
+    return render(request, 'movie_match/movie_profile.html', {'movie_id': movie_id})

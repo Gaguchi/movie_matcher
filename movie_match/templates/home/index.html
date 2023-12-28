@@ -16,6 +16,7 @@
     </script>
     {% verbatim %}
     <script type="text/babel">
+
         function initReactApp() {
             const { useState, useEffect } = React;
             const options = {
@@ -52,7 +53,7 @@
 					<div class="dz-content">
 						<div class="left-content style-2">
 							<span class="badge style-3 mb-2">Release Date: {movie.release_date}</span>
-							<h4 class="title"><a href="profile-detail.html">{movie.title}</a></h4>
+                            <h4 class="title"><a href={`movie_match/movie_profile/${movie.id}`}>{movie.title}</a></h4>
 							<p><i class="icon feather icon-map-pin"></i>Vote Average: {movie.vote_average}</p>		
                             <div class="meta-btn">
                                 <a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100" onClick={() => onDislikedClick(movie)}>
