@@ -1,12 +1,12 @@
 # Movie Matcher - CS50W Capstone project
 
-Movie Matcher is an app for people who have a hard time deciding what movie to watch. This app will match the users up with movies which they can express interest in or reject and includes a "Wheel of Movies" that you can spin to decide which movie you're watching next.
+Having trouble picking your next movie to watch? Too many choices in movies that youre interested in have you paralised from the sheer number of choices? Well fear not! Movie Matcher is here to help! Movie Matcher will present you with a random movie from all different ganres and countries, simply swipe right if you're interested and swipe left if you are not. You now have a list of movies that you might not have even heard of before but have intrigued you for one reason or another, still can't choose which movie to watch first? Use our "wheel of movies" or "plinko" games to see which of the movies you're interested in you'll land on and now you'll have to watch that one (unless you didn't like what you landed on, in which case you can try again). Theres an ocean of movies out there waiting to be discovered by you, all you have to do is dive in!
 
 This app was made with django and react.
 
 ## Installation
 
-Foe this app to work you need to install django and register on tmdb.org to get an api key (that you will then need to paste into index.html file [on line 25]).
+For this app to work you need to install django and register on tmdb.org to get an api key (that you will then need to paste into index.html file [on line 25]).
 
 ```bash
 pip install django
