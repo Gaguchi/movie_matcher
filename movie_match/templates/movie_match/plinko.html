@@ -6,31 +6,17 @@
 <link rel="stylesheet" class="main-css" type="text/css" href="{% static 'movie_match/assets/css/modal.css' %}">
 <!-- Page Content Start -->
 <div class="canvas-container">
-    {% if interested_movies_length >= 8 %}
+    {% if interested_movies_length >= 5 %}
         <canvas id="moviePlinkoCanvas" width="340" height="500"></canvas>
         <!-- Hidden element to store movies data -->
         <div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>
     {% else %}
-        <p>You need at least 8 movies to play the game. Please add more movies.</p>
+        <p>You need at least 5 movies to play the game. Please add more movies.</p>
     {% endif %}
 </div>
 <!-- Page Content End -->
 
 <!-- Sliders -->
-<div>
-    <label for="imgWidth">Image Width:</label>
-    <input type="range" id="imgWidth" name="imgWidth" min="1" max="100" value="42.5">
-    <span id="imgWidthValue"></span>
-    <label for="imgHeight">Image Height:</label>
-    <input type="range" id="imgHeight" name="imgHeight" min="1" max="500" value="100">
-    <span id="imgHeightValue"></span>
-    <label for="imgX">Image X:</label>
-    <input type="range" id="imgX" name="imgX" min="0" max="340" value="0">
-    <span id="imgXValue"></span>
-    <label for="imgY">Image Y:</label>
-    <input type="range" id="imgY" name="imgY" min="0" max="500" value="0">
-    <span id="imgYValue"></span>
-</div>
 
 <script src="{% static 'movie_match/assets/js/plinko.js' %}"></script>
 <script>
@@ -153,24 +139,6 @@
     } else {
         console.log('Like/Dislike buttons not found');  // Log if buttons are not found
     }
-
-        // Add event listeners to the sliders
-        document.getElementById('imgWidth').addEventListener('input', function(event) {
-            plinko.sectionWidth = event.target.value;
-            document.getElementById('imgWidthValue').textContent = event.target.value;
-        });
-        document.getElementById('imgHeight').addEventListener('input', function(event) {
-            plinko.sectionHeight = event.target.value;
-            document.getElementById('imgHeightValue').textContent = event.target.value;
-        });
-        document.getElementById('imgX').addEventListener('input', function(event) {
-            plinko.sectionX = event.target.value;
-            document.getElementById('imgXValue').textContent = event.target.value;
-        });
-        document.getElementById('imgY').addEventListener('input', function(event) {
-            plinko.sectionY = event.target.value;
-            document.getElementById('imgYValue').textContent = event.target.value;
-        });
     });
 </script>
 <!-- Modal -->
@@ -184,7 +152,7 @@
                             <img src="" alt="Movie Poster" class="img-fluid rounded modal-image">
                         </div>
                         <div class="custom-col">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">Movie Title.</h5>
+                            <h5 class="modal-title" id="exampleModalCenterTitle"><a class="movie-link" href="#">Movie Title.</a></h5>
                             <p class="card-text"><small class="text-muted">2017, David Ayer</small></p>
                         </div>
                     </div>
