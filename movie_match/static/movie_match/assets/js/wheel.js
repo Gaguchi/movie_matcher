@@ -149,7 +149,13 @@ function calculateWinner(angle, numberOfSegments, movies) {
 
         // Update and show the modal with winning movie details
         var modal = document.getElementById('exampleModalCenter');
-        modal.querySelector('.modal-title').textContent = winningMovie.fields.title;
+        let movieLink = modal.querySelector('.movie-link');
+        if (movieLink) {
+            movieLink.textContent = winningMovie.fields.title;
+            movieLink.href = `../movie_profile/`+ winningMovie.fields.movie_id+`/`;
+        } else {
+            console.error('Error: .movie-link element not found');
+        }
         modal.querySelector('.lead').textContent = winningMovie.fields.overview;
         modal.querySelector('.text-muted').textContent = winningMovie.fields.release_date;
         modal.querySelector('.modal-image').src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + winningMovie.fields.poster_path;
