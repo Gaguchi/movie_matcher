@@ -98,3 +98,16 @@ def index(request):
 
 def movie_profile(request, movie_id):
     return render(request, 'movie_match/movie_profile.html', {'movie_id': movie_id})
+
+
+@login_required
+def user_movies(request):
+    user = request.user
+
+    # Get all movies that the user has interacted with
+    user_movies = user.movies_interested.all() | user.movies_not_interested.all() | user.movies_liked.all() | user.movies_disliked.all() | user.movies_neutral.all()
+
+    # Serialize the movies to JSON
+    user_movies_json = serializers.serialize('json', user_movies)
+
+    return JsonResponse(user_movies_json, safe=False)

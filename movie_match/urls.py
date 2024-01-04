@@ -11,4 +11,5 @@ urlpatterns = [
     path('plinko/', movie_match_views.plinko, name='plinko'),
     path('login/', main_views.login_view, name='login'),
     path('movie_profile/<int:movie_id>/', movie_match_views.movie_profile, name='movie_profile'),
+    path('user_movies/', movie_match_views.user_movies, name='user_movies'),
 ]
