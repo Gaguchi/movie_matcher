@@ -58,14 +58,12 @@
 							<img src="{% static 'movie_match/assets/images/MovieMatcher.png' %}" alt="">
 						</a>
 					</div>
-					{% if user.is_authenticated %}
-					<div class="right-content dz-meta">
-						<a href="{% url 'profile' user.username %}" class="filter-icon">
-							<i class="fa-solid fa-user"></i>
+					
+					<div class="right-content d-flex gap-2">
+						<a href="javascript:void(0);" class="filter-icon icon-fill" data-bs-toggle="offcanvas" data-bs-target="#settingCanvas" aria-controls="offcanvasBottom">
+							<i class="fa-solid fa-filter"></i>
 						</a>
 					</div>
-					{% else %}
-					{% endif %}
 				</div>
 			</div>
 		</header>
@@ -160,6 +158,53 @@
 		</div>
 	</div>
 	<!-- Menubar -->
+	<!--  Setting OffCanvas -->
+    <div class="offcanvas offcanvas-bottom container p-0" tabindex="-1" id="settingCanvas">
+		<button type="button" class="btn-close drage-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		<div class="offcanvas-header share-style m-0">
+			<h4 class="title mb-0">Filter</h4>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+		</div>
+        <div class="offcanvas-body">
+			<div class="show-me mb-3">
+				<h6 class="title">Show Me</h6>
+				<a href="javascript:void(0);" class="btn d-flex align-items-center justify-content-between btn-light py-2 px-3 font-14" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom4" aria-controls="offcanvasBottom">
+					<span class="text-start d-block">Women</span>
+					<i class="font-20 icon feather icon-chevron-right"></i>
+				</a>
+			</div>
+			<div class="dz-slider">
+				<div class="slider-head">
+					<h6 class="title mb-0">Age</h6>
+					<div class="title font-w600 font-16">
+						<span class="example-val title slider-margin-value-min"></span>
+						<span class="example-val title slider-margin-value-max"></span>
+					</div>
+				</div>
+				<div class="slider-body">
+					<div class="range-slider style-1 w-100">
+						<div id="slider-tooltips4"></div>
+					</div>
+				</div>
+			</div>
+			<div class="dz-slider mb-3">
+				<div class="slider-head">
+					<h6 class="title mb-0">Distance</h6>
+					<div class="title font-w600 font-16">
+						<span class="example-val title slider-margin-value-min"></span>
+						<span class="example-val title slider-margin-value-max"></span>
+					</div>
+				</div>
+				<div class="slider-body">
+					<div class="range-slider style-1 w-100">
+						<div id="slider-tooltips3"></div>
+					</div>
+				</div>
+			</div>
+			<a href="javascript:void(0);" class="btn btn-primary w-100 rounded-xl">Apply</a>
+        </div>
+    </div>
+	<!--  Setting OffCanvas -->
 </div>  
 <!--**********************************
     Scripts
