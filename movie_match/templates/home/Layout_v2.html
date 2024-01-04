@@ -102,6 +102,14 @@
 					</a>
 				</li>
 				<li>
+					<a class="nav-link" href="{% url 'movie_match:plinko' %}">
+						<span class="dz-icon">
+							<i class="fa-solid fa-circle"></i>
+						</span>
+						<span>Plinko</span>
+					</a>
+				</li>
+				<li>
 					{% if user.is_authenticated %}
 					<a class="nav-link" href="{% url 'profile' user.username %}">
 						<span class="dz-icon">
@@ -139,6 +147,9 @@
 			</a>
 			<a href="{% url 'movie_match:wheel_of_movies' %}" class="nav-link">
 				<i class="fa-solid fa-dharmachakra"></i>
+			</a>
+			<a href="{% url 'movie_match:plinko' %}" class="nav-link">
+				<i class="fa-solid fa-circle"></i>
 			</a>
 			{% if user.is_authenticated %}
 			<a href="{% url 'profile' user.username %}" class="nav-link">

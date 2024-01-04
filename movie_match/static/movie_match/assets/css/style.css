@@ -8265,3 +8265,11 @@ body.theme-dark.body-bg2 {
     width: 72px;
     height: 72px;
     opacity: 0; } }
+
+    .canvas-container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      align-content: center;
+      justify-content: center;
+  }

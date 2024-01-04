@@ -34,7 +34,10 @@
         plinko.loop();
 
         canvas.addEventListener('click', (event) => {
-            plinko.addBall(event.clientX, event.clientY);
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            plinko.addBall(x, y);
         });
 
         
