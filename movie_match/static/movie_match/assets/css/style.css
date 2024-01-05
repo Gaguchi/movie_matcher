@@ -21,7 +21,7 @@
   --light: #E6E6E6;
   --text-accent: #69708A;
   --text-light: #A19FA8;
-  --btn-gradient: linear-gradient(0deg, #FE3D96 0%, #FFA4CF 100%);
+  --btn-gradient: linear-gradient(0deg, #d8bc1f 0%, #dfd89f 100%);
   --btn-shadow: 0px 24px 30px 0px rgba(255, 63, 152, 0.20); }
 
 :root {
