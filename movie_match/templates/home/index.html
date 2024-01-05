@@ -88,7 +88,32 @@
                 const [isMeaningfulSwipe, setIsMeaningfulSwipe] = useState(false);
                 const [seenLiked, setSeenLiked] = useState(false);
                 const [seenDisliked, setSeenDisliked] = useState(false);
+                const [currentPage, setCurrentPage] = useState(1);  
 
+                const genres = [
+                    { id: 28, name: "Action" },
+                    { id: 12, name: "Adventure" },
+                    { id: 16, name: "Animation" },
+                    { id: 35, name: "Comedy" },
+                    { id: 80, name: "Crime" },
+                    { id: 99, name: "Documentary" },
+                    { id: 18, name: "Drama" },
+                    { id: 10751, name: "Family" },
+                    { id: 14, name: "Fantasy" },
+                    { id: 36, name: "History" },
+                    { id: 27, name: "Horror" },
+                    { id: 10402, name: "Music" },
+                    { id: 9648, name: "Mystery" },
+                    { id: 10749, name: "Romance" },
+                    { id: 878, name: "Science Fiction" },
+                    { id: 10770, name: "TV Movie" },
+                    { id: 53, name: "Thriller" },
+                    { id: 10752, name: "War" },
+                    { id: 37, name: "Western" }
+                ];
+
+                const [genreOption, setGenreOption] = useState([]);   // Change this line to an array
+        
                 const [lastFetchTime, setLastFetchTime] = useState(0);
 
                 const handleLikedClick = (movie) => {
@@ -131,42 +156,47 @@
                         });
                 };
 
-                const fetchMovies = () => {
+                const fetchMovies = (page = 1) => {
+                    console.log('Fetching page:', page);
+                    console.log('Fetch options:', options);
                     const currentTime = new Date().getTime();
-
-                    // Check if it's been at least 1 second since the last fetch
-                    if (currentTime - lastFetchTime >= 1000) {
-                        const randomPage = getRandomPage();
-
-                        fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=${sortOption}`, options)
+                    if (currentTime - lastFetchTime >= 1) {
+                        const genreParam = genreOption.length > 0 ? `&with_genres=${genreOption.join(',')}` : '';
+                        fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&page=${page}&language=en-US&sort_by=${sortOption}${genreParam}`, options)
                             .then(response => response.json())
                             .then(data => {
-                                // Exclude the movies that the user has interacted with
-                                const moviesToDisplay = data.results.filter(movie => !userMovies.includes(movie));
-
-                                setMovies(prevMovies => [...prevMovies, ...moviesToDisplay]);
-                            }, [sortOption])
-                            .catch(err => {
-                                console.error('Failed to fetch movies:', err);
+                                const moviesToDisplay = data.results.filter(movie => !userMovies.includes(movie.id));
+                                console.log('Fetched movies:', data.results);
+                                console.log('Filtered movies:', moviesToDisplay);
+                                if (moviesToDisplay.length === 0 && page < data.total_pages) {
+                                    console.log('No fetched movies match the selected genres. Fetching more movies.');
+                                    fetchMovies(page + 1);
+                                } else {
+                                    setMovies(prevMovies => [...prevMovies, ...moviesToDisplay]);
+                                    setLastFetchTime(currentTime);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
                             });
-
-                        // Update the last fetch time
-                        setLastFetchTime(currentTime);
                     }
                 };
 
                 window.applyFetch = function() {
-                    // Call the fetchMovies function
-                    fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=${sortOption}`, options)
-                        .then(response => response.json())
-                        .then(data => {
-                            // Update the movies on the page
-                            setMovies(data.results);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
+                    console.log('Selected genres:', genreOption);
+                    setMovies([]);  // Clear the existing movies
+                    fetchMovies();  // Fetch new movies starting from page 1
                 }
+        
+                const toggleGenre = genreId => {
+                    setGenreOption(prevGenres => {
+                        if (prevGenres.includes(genreId)) {
+                            return prevGenres.filter(id => id !== genreId);
+                        } else {
+                            return [...prevGenres, genreId];
+                        }
+                    });
+                };
 
                 useEffect(() => {
                     fetchUserMovies();
@@ -206,9 +236,6 @@
                         rejectStyle: { opacity: translateX < 0 ? opacity : 0 }
                     };
                 };
-                
-                
-                
                 
                 const sendSwipeDataToServer = (movie, isInterested, isNotInterested, liked, disliked) => {
                     // Include the movieId in the URL
@@ -281,7 +308,6 @@
                 }, 16); // approx 60 frames per second
 
                 
-                
                 const handleStart = (e) => {
                     e.stopPropagation();
                     setIsSwiping(true);
@@ -338,7 +364,6 @@
                     setCurrentX(0);
                 };
                 
-                
                 if (movies.length < 2) {
                     return <div>Loading...</div>;
                 }
@@ -389,12 +414,20 @@
                         <div class="offcanvas-body">
                             <div class="show-me mb-3">
                                 <h6 class="title">Sort by:</h6>
-                                <select value={sortOption} onChange={e => setSortOption(e.target.value)}>
-                                    <option value="popularity.desc">Popularity Descending</option>
-                                    <option value="popularity.asc">Popularity Ascending</option>
-                                    <option value="vote_average.desc">Rating Descending</option>
-                                    <option value="vote_average.asc">Rating Ascending</option>
-                                </select>
+                                <div>
+                                    {genres.map(genre => (
+                                        <button
+                                            key={genre.id}
+                                            className={genreOption.includes(genre.id) ? 'active' : ''}
+                                            onClick={() => {
+                                                toggleGenre(genre.id);
+                                                console.log('Genre clicked:', genre.id, genre.name);  // Log the clicked genre
+                                            }}
+                                        >
+                                            {genre.name}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                             <div class="dz-slider">
                                 <div class="slider-head">
@@ -424,7 +457,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <a  href="javascript:void(0);"  onClick={applyFetch} class="btn btn-primary w-100 rounded-xl" id="apply">Apply</a>
+                            <a  href="javascript:void(0);"  onClick={window.applyFetch} class="btn btn-primary w-100 rounded-xl" id="apply">Apply</a>
                         </div>
                     </div>    
                     </div>           

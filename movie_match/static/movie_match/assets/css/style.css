@@ -1913,7 +1913,8 @@
   .offcanvas .offcanvas-backdrop.show {
     opacity: 0.3 !important; }
   .offcanvas .offcanvas-body {
-    max-height: 100vh; }
+    max-height: 100vh;
+    margin-bottom: 50px; }
     .offcanvas .offcanvas-body.fixed {
       border-radius: 0;
       margin-bottom: 200px; }
@@ -7418,7 +7419,7 @@ svg.radial-progress {
   height: 100%;
   position: absolute;
   left: 0;
-  top: 0;
+  top: 100px;
   right: 0;
   bottom: 0;
 }
@@ -8273,3 +8274,7 @@ body.theme-dark.body-bg2 {
       align-content: center;
       justify-content: center;
   }
+
+.offcanvas-backdrop.show {
+    opacity: 0;
+}
