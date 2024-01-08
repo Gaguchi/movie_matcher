@@ -19,13 +19,56 @@ python manage.py runserver
 
 I believe this project satisfies the requirements for both distinctiveness and complexity for the following reasons: This project uses APIs from third-party sources as well as generating APIs of its own. The custom-made "Wheel of Movies" not only generates a wheel with correct proportions for its segment and movie posters inside those segments but also can rotate and read which movie the wheel lands on, after which it can utilise django views to update the database based on user input and generate the wheel again, dynamically adjusting the segments of the wheel (meaning a wheel with fewer segments will have larger segments). 
  
-## Files of note
-* Layout_v2.html - this file is using django template system to export footer and header to other html template files.
-* index.html - fetches the movie data from the external API and saves the modified movie information on to the server.
-* profile.html - displayed the saved movies 
-* wheel_of_movies.html - displays the wheel of movies and handles the sending of the movie data to the server (similar to index.html)  
-* custom.js - handles the display setting and the preloader animation
-* wheel.js - handles the drawing of the wheel, the images on the wheel, the spin of the wheel, the drawing of the indicator and the spin sign and the calculation of the winning movie.
-* movies_project/views.py - handles user login and registration 
-* movie_match/views.py - handles saving movies onto the server and sends the movie data to the wheel_of_movies.html
-* movie_match/models.py - handles the movies and the users models
+## Files
+
+### views.py
+
+#### save_movie_data
+
+Handles the saving of movie data and user preferences.
+
+#### wheel_of_movies
+
+Displays a wheel of movies based on user preferences.
+
+#### plinko
+
+Renders a Plinko-style game with movies based on user preferences.
+
+#### index
+
+Displays the homepage.
+
+#### movie_profile
+
+Renders the movie profile page.
+
+#### user_movies
+
+Returns JSON response with all movies that the user has interacted with.
+
+### models.py
+
+Defines Django models for movies and users.
+
+#### Movie Model
+
+- Fields include `adult`, `backdrop_path`, `genre_ids`, `movie_id`, `original_language`, `original_title`, `overview`, `popularity`, `poster_path`, `release_date`, `title`, `video`, `vote_average`, and `vote_count`.
+
+#### User Model
+
+Extends Django's `AbstractUser` model and includes additional fields like `friends`, and various `movies_*` fields for different user interactions with movies.
+
+## Usage
+
+Ensure Django is properly configured, and migrations are applied before running the web app.
+
+### Installation
+
+1. Clone the repository.
+2. Install dependencies using `pip install -r requirements.txt`.
+3. Apply migrations with `python manage.py migrate`.
+
+### Running the App
+
+Execute `python manage.py runserver` and access the app in your browser at `http://localhost:8000/`.
