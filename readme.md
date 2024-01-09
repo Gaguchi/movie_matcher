@@ -20,55 +20,85 @@ python manage.py runserver
 I believe this project satisfies the requirements for both distinctiveness and complexity for the following reasons: This project uses APIs from third-party sources as well as generating APIs of its own. The custom-made "Wheel of Movies" not only generates a wheel with correct proportions for its segment and movie posters inside those segments but also can rotate and read which movie the wheel lands on, after which it can utilise django views to update the database based on user input and generate the wheel again, dynamically adjusting the segments of the wheel (meaning a wheel with fewer segments will have larger segments). 
  
 ## Files
+# Movie Match Web App - Views
 
-### views.py
+## `views.py`
 
-#### save_movie_data
-
+### `save_movie_data(request, movie_id=None)`
 Handles the saving of movie data and user preferences.
 
-#### wheel_of_movies
+- **Method**: POST
+- **Parameters**:
+  - `request`: Django request object.
+  - `movie_id`: Optional parameter indicating the movie ID.
+- **Flow**:
+  1. Parses JSON data from the request body.
+  2. Checks if the movie already exists in the database, updates or creates a new entry.
+  3. Associates user preferences with the movie based on the received data.
+  4. Returns a JSON response with a success message and the updated list of interested movies.
+- **Error Handling**: Catches exceptions, prints the traceback, and returns an error response if an exception occurs.
 
-Displays a wheel of movies based on user preferences.
+### `wheel_of_movies(request)`
+Renders a page displaying a wheel of movies based on the user's interested movies.
 
-#### plinko
+- **Method**: GET
+- **Parameters**:
+  - `request`: Django request object.
+- **Flow**:
+  1. Fetches interested movies for the current user.
+  2. Serializes the queryset to JSON format.
+  3. Renders the 'wheel_of_movies.html' template, passing the serialized JSON to the template.
+- **Access Control**: Requires user authentication.
 
-Renders a Plinko-style game with movies based on user preferences.
+### `plinko(request)`
+Renders a page (likely a Plinko-style game) with movies based on the user's preferences.
 
-#### index
+- **Method**: GET
+- **Parameters**:
+  - `request`: Django request object.
+- **Flow**:
+  1. Fetches interested movies for the current user.
+  2. Serializes the queryset to JSON format.
+  3. Renders the 'plinko.html' template, passing the serialized JSON and the length of the queryset to the template.
+- **Access Control**: Requires user authentication.
 
-Displays the homepage.
+### `index(request)`
+Renders the homepage.
 
-#### movie_profile
+- **Method**: GET
+- **Parameters**:
+  - `request`: Django request object.
+- **Flow**: Renders the 'home/index.html' template.
 
-Renders the movie profile page.
+### `movie_profile(request, movie_id)`
+Renders a page displaying details about a specific movie.
 
-#### user_movies
+- **Method**: GET
+- **Parameters**:
+  - `request`: Django request object.
+  - `movie_id`: Movie ID to display details for.
+- **Flow**: Renders the 'movie_match/movie_profile.html' template, passing the movie_id to the template.
 
-Returns JSON response with all movies that the user has interacted with.
+### `user_movies(request)`
+Returns a JSON response containing all movies that the user has interacted with.
 
-### models.py
+- **Method**: GET
+- **Parameters**:
+  - `request`: Django request object.
+- **Flow**:
+  1. Fetches all movies that the user has interacted with.
+  2. Serializes the movies to JSON.
+  3. Returns a JSON response with the serialized data.
+- **Access Control**: Requires user authentication.
 
-Defines Django models for movies and users.
+## URLs (`urls.py`)
 
-#### Movie Model
+Defines URL patterns for the `movie_match` app.
 
-- Fields include `adult`, `backdrop_path`, `genre_ids`, `movie_id`, `original_language`, `original_title`, `overview`, `popularity`, `poster_path`, `release_date`, `title`, `video`, `vote_average`, and `vote_count`.
-
-#### User Model
-
-Extends Django's `AbstractUser` model and includes additional fields like `friends`, and various `movies_*` fields for different user interactions with movies.
-
-## Usage
-
-Ensure Django is properly configured, and migrations are applied before running the web app.
-
-### Installation
-
-1. Clone the repository.
-2. Install dependencies using `pip install -r requirements.txt`.
-3. Apply migrations with `python manage.py migrate`.
-
-### Running the App
-
-Execute `python manage.py runserver` and access the app in your browser at `http://localhost:8000/`.
+- `/`: Root URL, associated with the `index` view.
+- `/save_movie_data/<int:movie_id>/`: URL pattern for saving movie data, associated with the `save_movie_data` view.
+- `/wheel/`: URL pattern for the wheel of movies, associated with the `wheel_of_movies` view.
+- `/plinko/`: URL pattern for Plinko game, associated with the `plinko` view.
+- `/login/`: URL pattern for user login, associated with the `main_views.login_view`.
+- `/movie_profile/<int:movie_id>/`: URL pattern for movie profile, associated with the `movie_profile` view.
+- `/user_movies/`: URL pattern for user movie data, associated with the `user_movies` view.
