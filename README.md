@@ -20,8 +20,6 @@ python manage.py runserver
 I believe this project satisfies the requirements for both distinctiveness and complexity for the following reasons: This project uses APIs from third-party sources as well as generating APIs of its own. The custom-made "Wheel of Movies" not only generates a wheel with correct proportions for its segment and movie posters inside those segments but also can rotate and read which movie the wheel lands on, after which it can utilise django views to update the database based on user input and generate the wheel again, dynamically adjusting the segments of the wheel (meaning a wheel with fewer segments will have larger segments). 
  
 ## Files
-# Movie Match Web App - Views
-
 ## `views.py`
 
 ### `save_movie_data(request, movie_id=None)`
