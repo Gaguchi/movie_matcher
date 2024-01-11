@@ -20,76 +20,25 @@ python manage.py runserver
 I believe this project satisfies the requirements for both distinctiveness and complexity for the following reasons: This project uses APIs from third-party sources as well as generating APIs of its own. The custom-made "Wheel of Movies" not only generates a wheel with correct proportions for its segment and movie posters inside those segments but also can rotate and read which movie the wheel lands on, after which it can utilise django views to update the database based on user input and generate the wheel again, dynamically adjusting the segments of the wheel (meaning a wheel with fewer segments will have larger segments). 
  
 ## Files
-# Movie Match Web App - Views
-
 ## `views.py`
 
-### `save_movie_data(request, movie_id=None)`
-Handles the saving of movie data and user preferences.
+### `save_movie_data`
+Handles the saving of movie data and user preferences. Gets the movie data that is sent to it with a POST request, checkes wheres the movie is 'interested', 'not interested, 'seen and liked' or 'seen and disliked' and saves the movie accordingly. If the movie has already been saved it updates the 'interested', 'not interested, 'seen and liked' or 'seen and disliked', so that when the user watches the movie they can update it accordingly (fer example if the user marks a movie that was previousely in the 'interested' table with 'seen_liked' the movie is taken out of the 'interested' table and is placed in the 'seen and liked' table).
 
-- **Method**: POST
-- **Parameters**:
-  - `request`: Django request object.
-  - `movie_id`: Optional parameter indicating the movie ID.
-- **Flow**:
-  1. Parses JSON data from the request body.
-  2. Checks if the movie already exists in the database, updates or creates a new entry.
-  3. Associates user preferences with the movie based on the received data.
-  4. Returns a JSON response with a success message and the updated list of interested movies.
-- **Error Handling**: Catches exceptions, prints the traceback, and returns an error response if an exception occurs.
-
-### `wheel_of_movies(request)`
-Renders a page displaying a wheel of movies based on the user's interested movies.
-
-- **Method**: GET
-- **Parameters**:
-  - `request`: Django request object.
-- **Flow**:
-  1. Fetches interested movies for the current user.
-  2. Serializes the queryset to JSON format.
-  3. Renders the 'wheel_of_movies.html' template, passing the serialized JSON to the template.
-- **Access Control**: Requires user authentication.
+### `wheel_of_movies`
+Renders a page displaying a wheel of movies based on the user's interested movies. On request sends up to 8 movies from the 'intrested' table in JSON format.
 
 ### `plinko(request)`
-Renders a page (likely a Plinko-style game) with movies based on the user's preferences.
-
-- **Method**: GET
-- **Parameters**:
-  - `request`: Django request object.
-- **Flow**:
-  1. Fetches interested movies for the current user.
-  2. Serializes the queryset to JSON format.
-  3. Renders the 'plinko.html' template, passing the serialized JSON and the length of the queryset to the template.
-- **Access Control**: Requires user authentication.
+Renders a page displaying a Plinko-style game with movies based on the user's interested movies.
 
 ### `index(request)`
 Renders the homepage.
 
-- **Method**: GET
-- **Parameters**:
-  - `request`: Django request object.
-- **Flow**: Renders the 'home/index.html' template.
-
 ### `movie_profile(request, movie_id)`
 Renders a page displaying details about a specific movie.
 
-- **Method**: GET
-- **Parameters**:
-  - `request`: Django request object.
-  - `movie_id`: Movie ID to display details for.
-- **Flow**: Renders the 'movie_match/movie_profile.html' template, passing the movie_id to the template.
-
 ### `user_movies(request)`
 Returns a JSON response containing all movies that the user has interacted with.
-
-- **Method**: GET
-- **Parameters**:
-  - `request`: Django request object.
-- **Flow**:
-  1. Fetches all movies that the user has interacted with.
-  2. Serializes the movies to JSON.
-  3. Returns a JSON response with the serialized data.
-- **Access Control**: Requires user authentication.
 
 ## URLs (`urls.py`)
 
