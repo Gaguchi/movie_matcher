@@ -22,8 +22,8 @@ I believe this project satisfies the requirements for both distinctiveness and c
 ## Files
 ## `views.py`
 
-### `save_movie_data(request, movie_id=None)`
-Handles the saving of movie data and user preferences.
+### `save_movie_data`
+Handles the saving of movie data and user preferences. Gets the movie data that is sent to it with a POST request, checkes wheres the movie is 'interested', 'not interested, 'seen and liked' or 'seen and disliked' and saves the movie accordingly. If the movie has already been saved it updates the 'interested', 'not interested, 'seen and liked' or 'seen and disliked', so that when the user watches the movie they can update it accordingly.
 
 - **Method**: POST
 - **Parameters**:
