@@ -8278,3 +8278,27 @@ body.theme-dark.body-bg2 {
 .offcanvas-backdrop.show {
     opacity: 0;
 }
+
+button{
+  font-size: 1rem;
+    font-weight: 500;
+    padding: 5px 5px;
+    line-height: 26px;
+    margin: 3px;
+    border-width: 0px;
+    font-family: var(--font-family-title);
+    border-radius: var(--border-radius);
+    -webkit-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+button.active {
+  color: white;
+  background: #4e4e4e;
+  font-weight: 700;
+}
+
+.btn:hover, .btn:focus, .btn:active {
+  color: #4e4e4e;
+}

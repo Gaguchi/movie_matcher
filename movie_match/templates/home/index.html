@@ -413,7 +413,7 @@
                         </div>
                         <div class="offcanvas-body">
                             <div class="show-me mb-3">
-                                <h6 class="title">Sort by:</h6>
+                                <h6 class="title">Categories:</h6>
                                 <div>
                                     {genres.map(genre => (
                                         <button
@@ -427,34 +427,6 @@
                                             {genre.name}
                                         </button>
                                     ))}
-                                </div>
-                            </div>
-                            <div class="dz-slider">
-                                <div class="slider-head">
-                                    <h6 class="title mb-0">Age</h6>
-                                    <div class="title font-w600 font-16">
-                                        <span class="example-val title slider-margin-value-min"></span>
-                                        <span class="example-val title slider-margin-value-max"></span>
-                                    </div>
-                                </div>
-                                <div class="slider-body">
-                                    <div class="range-slider style-1 w-100">
-                                        <div id="slider-tooltips4"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dz-slider mb-3">
-                                <div class="slider-head">
-                                    <h6 class="title mb-0">Distance</h6>
-                                    <div class="title font-w600 font-16">
-                                        <span class="example-val title slider-margin-value-min"></span>
-                                        <span class="example-val title slider-margin-value-max"></span>
-                                    </div>
-                                </div>
-                                <div class="slider-body">
-                                    <div class="range-slider style-1 w-100">
-                                        <div id="slider-tooltips3"></div>
-                                    </div>
                                 </div>
                             </div>
                             <a  href="javascript:void(0);"  onClick={window.applyFetch} class="btn btn-primary w-100 rounded-xl" id="apply">Apply</a>

@@ -25,7 +25,7 @@ def save_movie_data(request, movie_id=None):
         seen_liked = data.get('seenLiked')
         seen_disliked = data.get('seenDisliked')
 
-        # Check if the movie already exists in the database
+
         movie, created = Movie.objects.get_or_create(
             movie_id=movie_id,
             defaults={
@@ -45,7 +45,6 @@ def save_movie_data(request, movie_id=None):
             }
         )
 
-        # Assuming the user is logged in
         if request.user.is_authenticated:
             request.user.movies_interested.remove(movie)
             request.user.movies_not_interested.remove(movie)
@@ -68,25 +67,23 @@ def save_movie_data(request, movie_id=None):
 
 
     except Exception as e:
-        traceback.print_exc()  # Prints the full traceback
+        traceback.print_exc()
         return JsonResponse({"error": f"An error occurred: {e}"}, status=500)
 
 @login_required
 def wheel_of_movies(request):
     user = request.user
     interested_movies_qs = user.movies_interested.all()[:8]
-    # Serializing the queryset to JSON format
     interested_movies = serializers.serialize('json', interested_movies_qs)
     return render(request, "movie_match/wheel_of_movies.html", {
-        "interested_movies_json": interested_movies  # Pass the serialized JSON to the template
+        "interested_movies_json": interested_movies
     })
 
 @login_required
 def plinko(request):
     user = request.user
     interested_movies_qs = user.movies_interested.all()[:5]
-    interested_movies_length = len(interested_movies_qs)  # Get the length of the queryset
-    # Serializing the queryset to JSON format
+    interested_movies_length = len(interested_movies_qs) 
     interested_movies = serializers.serialize('json', interested_movies_qs)
     return render(request, "movie_match/plinko.html", {
         'interested_movies_json': interested_movies,
@@ -103,11 +100,6 @@ def movie_profile(request, movie_id):
 @login_required
 def user_movies(request):
     user = request.user
-
-    # Get all movies that the user has interacted with
     user_movies = user.movies_interested.all() | user.movies_not_interested.all() | user.movies_liked.all() | user.movies_disliked.all() | user.movies_neutral.all()
-
-    # Serialize the movies to JSON
     user_movies_json = serializers.serialize('json', user_movies)
-
     return JsonResponse(user_movies_json, safe=False)
