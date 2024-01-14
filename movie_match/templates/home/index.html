@@ -7,6 +7,10 @@
 	<div class="page-content space-top p-b65">
 		<div class="container fixed-full-area">
 			<div id="root" class="dzSwipe_card-cont dz-gallery-slider" style="display:contents">
+            </div>
+        </div>
+    </div>
+    <div id="filters"></div>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof initReactApp === 'function') {
@@ -150,6 +154,7 @@
                         .then(userMovies => {
                             setUserMovies(userMovies);
                             console.log('User movies:', userMovies);
+                            fetchMovies();  // Fetch movies after userMovies has been updated
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -368,6 +373,41 @@
                     return <div>Loading...</div>;
                 }
             
+                
+                const filtersDiv = document.getElementById('filters');
+                if (filtersDiv) {
+                    ReactDOM.render(
+                        <div className="offcanvas offcanvas-bottom container p-0" tabindex="-1" id="settingCanvas">
+                            <button type="button" className="btn-close drage-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                            <div className="offcanvas-header share-style m-0">
+                                <h4 className="title mb-0">Filter</h4>
+                                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"><i className="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div className="offcanvas-body">
+                                <div className="show-me mb-3">
+                                    <h6 className="title">Categories:</h6>
+                                    <div>
+                                        {genres.map(genre => (
+                                            <button
+                                                key={genre.id}
+                                                className={genreOption.includes(genre.id) ? 'active' : ''}
+                                                onClick={() => {
+                                                    toggleGenre(genre.id);
+                                                    console.log('Genre clicked:', genre.id, genre.name);  // Log the clicked genre
+                                                }}
+                                            >
+                                                {genre.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <a  href="javascript:void(0);"  onClick={window.applyFetch} className="btn btn-primary w-100 rounded-xl" id="apply">Apply</a>
+                            </div>
+                        </div>,
+                        filtersDiv
+                    );
+                }
+
                 return (
                     <div 
                         className="justify-content-center align-items-center dzSwipe_card-cont dz-gallery-slider"
@@ -404,37 +444,13 @@
                                 )}                                
                             </div>
                         );
-                    })}
-                    <div class="offcanvas offcanvas-bottom container p-0" tabindex="-1" id="settingCanvas">
-                        <button type="button" class="btn-close drage-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                        <div class="offcanvas-header share-style m-0">
-                            <h4 class="title mb-0">Filter</h4>
-                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <div class="offcanvas-body">
-                            <div class="show-me mb-3">
-                                <h6 class="title">Categories:</h6>
-                                <div>
-                                    {genres.map(genre => (
-                                        <button
-                                            key={genre.id}
-                                            className={genreOption.includes(genre.id) ? 'active' : ''}
-                                            onClick={() => {
-                                                toggleGenre(genre.id);
-                                                console.log('Genre clicked:', genre.id, genre.name);  // Log the clicked genre
-                                            }}
-                                        >
-                                            {genre.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <a  href="javascript:void(0);"  onClick={window.applyFetch} class="btn btn-primary w-100 rounded-xl" id="apply">Apply</a>
-                        </div>
-                    </div>    
+                    })}   
                     </div>           
                 );
             };
+
+
+
 
             ReactDOM.render(<App />, document.getElementById('root'));
         }
