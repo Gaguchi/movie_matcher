@@ -135,10 +135,13 @@
                 };
 
                 const moveToNextMovie = () => {
-                    setBottomIndex(prevBottomIndex => prevBottomIndex + 1);
                     setTopIndex(prevTopIndex => {
-                        const newTopIndex = prevTopIndex + 1;
-                        if (newTopIndex > movies.length - 3) {
+                        let newTopIndex = prevTopIndex + 1;
+                        if (newTopIndex >= filteredMovies.length) {
+                            console.log('Reached the end of the filtered movies array');
+                            newTopIndex = prevTopIndex;  // Return the previous index if we've reached the end of the array
+                        }
+                        if (newTopIndex > filteredMovies.length - 3) {
                             fetchMovies();
                         }
                         return newTopIndex;
