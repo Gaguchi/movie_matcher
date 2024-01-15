@@ -121,15 +121,19 @@
                 const [lastFetchTime, setLastFetchTime] = useState(0);
 
                 const handleLikedClick = (movie) => {
-                    sendSwipeDataToServer(movie, false, false, true, false);
-                    moveToNextMovie();
+                    sendSwipeDataToServer(movie, false, false, true, false)
+                        .then(() => {
+                            moveToNextMovie();
+                        });
                 };
-                
+
                 const handleDislikedClick = (movie) => {
-                    sendSwipeDataToServer(movie, false, false, false, true);
-                    moveToNextMovie();
+                    sendSwipeDataToServer(movie, false, false, false, true)
+                        .then(() => {
+                            moveToNextMovie();
+                        });
                 };
-            
+
                 const moveToNextMovie = () => {
                     setBottomIndex(prevBottomIndex => prevBottomIndex + 1);
                     setTopIndex(prevTopIndex => {
@@ -173,8 +177,8 @@
                                 const moviesToDisplay = data.results.filter(movie => !userMovies.includes(movie.id));
                                 console.log('Fetched movies:', data.results);
                                 console.log('Filtered movies:', moviesToDisplay);
-                                if (moviesToDisplay.length === 0 && page < data.total_pages) {
-                                    console.log('No fetched movies match the selected genres. Fetching more movies.');
+                                if (moviesToDisplay.length <= 1 && page < data.total_pages) {
+                                    console.log('Not enough movies match the selected genres. Fetching more movies.');
                                     fetchMovies(page + 1);
                                 } else {
                                     setMovies(prevMovies => [...prevMovies, ...moviesToDisplay]);
@@ -242,43 +246,6 @@
                     };
                 };
                 
-                const sendSwipeDataToServer = (movie, isInterested, isNotInterested, liked, disliked) => {
-                    // Include the movieId in the URL
-                    fetch(`/movie_match/save_movie_data/${movie.id}/`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        isInterested,
-                        isNotInterested,
-                        seenLiked: liked,
-                        seenDisliked: disliked,
-                        movieId: movie.id,
-                        title: movie.title,
-                        overview: movie.overview,
-                        release_date: movie.release_date,
-                        popularity: movie.popularity,
-                        vote_average: movie.vote_average,
-                        original_language: movie.original_language,
-                        original_title: movie.original_title,
-                        genre_ids: movie.genre_ids,
-                        backdrop_path: movie.backdrop_path,
-                        poster_path: movie.poster_path,
-                        video: movie.video,
-                        vote_count: movie.vote_count,
-                        adult: movie.adult
-                        // Add any other properties you wish to send
-                      })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                      console.log('Successfully sent swipe data:', data);
-                    })
-                    .catch(err => {
-                      console.error('Failed to send swipe data:', err);
-                    });
-                  };
                   
 
 
@@ -324,43 +291,49 @@
                 
                 const handleEnd = (e) => {
                     e.stopPropagation();
-                    console.log('handleEnd triggered');  // Debugging log
+                    console.log('handleEnd triggered');
                 
                     const swipeDistance = Math.abs(currentX - startX);
-                    console.log('Swipe distance:', swipeDistance);  // Debugging log
+                    console.log('Swipe distance:', swipeDistance);
                 
                     if (swipeDistance > 200) {
-                        console.log('Meaningful swipe detected');  // Debugging log
+                        console.log('Meaningful swipe detected');
                 
                         // Determine swipe direction
                         let isInterested;
                         let isNotInterested;
                         if (currentX > startX) {
                             console.log('Swipe right');
-                            isInterested = true; 
+                            isInterested = true;
                         } else {
                             console.log('Swipe left');
-                            isNotInterested = true; 
+                            isNotInterested = true;
                         }
                 
                         setIsMeaningfulSwipe(true);
-                
+
                         setBottomIndex(prevTopIndex => prevTopIndex + 1);
                 
-                        setTopIndex(prevTopIndex => {
-                            const newTopIndex = prevTopIndex + 1;
-                            if (newTopIndex > movies.length - 3) {
-                                fetchMovies();
-                            }
-                            return newTopIndex;
-                        });
-                        
-                        const movie = movies[topIndex];
-                        if (movie) {
-                            sendSwipeDataToServer(movie, isInterested, isNotInterested);  // Note: Passing the entire 'movie' object
+                        let newTopIndex = topIndex + 1;
+                        if (newTopIndex >= filteredMovies.length) {
+                            console.log('Reached the end of the filtered movies array');
+                            newTopIndex = topIndex;  // Return the previous index if we've reached the end of the array
                         }
+                        if (newTopIndex > filteredMovies.length - 3) {
+                            fetchMovies();
+                        }
+                        console.log('New top index:', newTopIndex);  // Debugging log
+                
+                        const movie = filteredMovies[newTopIndex - 1];
+                        if (movie) {
+                            let isLiked = isInterested;
+                            let isDisliked = !isInterested;
+                            sendSwipeDataToServer(movie, false, false, isLiked, isDisliked);
+                        }
+                
+                        setTopIndex(newTopIndex);
                     } else {
-                        console.log('Not a meaningful swipe');  // Debugging log
+                        console.log('Not a meaningful swipe');
                         setIsMeaningfulSwipe(false);
                     }
                 
@@ -368,12 +341,52 @@
                     setStartX(0);
                     setCurrentX(0);
                 };
+
                 
                 if (movies.length < 2) {
                     return <div>Loading...</div>;
                 }
             
                 
+                const sendSwipeDataToServer = (movie, isInterested, isNotInterested, liked, disliked) => {
+                    // Include the movieId in the URL
+                    fetch(`/movie_match/save_movie_data/${movie.id}/`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        isInterested,
+                        isNotInterested,
+                        seenLiked: liked,
+                        seenDisliked: disliked,
+                        movieId: movie.id,
+                        title: movie.title,
+                        overview: movie.overview,
+                        release_date: movie.release_date,
+                        popularity: movie.popularity,
+                        vote_average: movie.vote_average,
+                        original_language: movie.original_language,
+                        original_title: movie.original_title,
+                        genre_ids: movie.genre_ids,
+                        backdrop_path: movie.backdrop_path,
+                        poster_path: movie.poster_path,
+                        video: movie.video,
+                        vote_count: movie.vote_count,
+                        adult: movie.adult
+                        // Add any other properties you wish to send
+                      })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Sending movie to server:", movie);
+                        console.log('Successfully sent swipe data:', data);
+                    })
+                    .catch(err => {
+                        console.error('Failed to send swipe data:', err);
+                    });
+                  };
+                  
                 const filtersDiv = document.getElementById('filters');
                 if (filtersDiv) {
                     ReactDOM.render(
