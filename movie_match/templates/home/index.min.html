@@ -1,27 +1,4 @@
-{% extends 'home/Layout_v2.html' %}
-{% load static %} <!-- Replace with your base template -->
-
-{% block content %}
-{% if user.is_authenticated %}
-	<!-- Page Content Start -->
-	<div class="page-content space-top p-b65">
-		<div class="container fixed-full-area">
-			<div id="root" class="dzSwipe_card-cont dz-gallery-slider" style="display:contents">
-            </div>
-        </div>
-    </div>
-    <div id="filters"></div>
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
-            if (typeof initReactApp === 'function') {
-                initReactApp();
-            }
-        });
-    </script>
-    {% verbatim %}
-    <script type="text/babel">
-
-        function initReactApp() {
+{% extends 'home/Layout_v2.html' %} {% load static %}<!-- Replace with your base template --> {% block content %} {% if user.is_authenticated %}<!-- Page Content Start --><div class="page-content space-top p-b65"><div class="container fixed-full-area"><div id="root" class="dzSwipe_card-cont dz-gallery-slider" style="display:contents"></div></div></div><div id="filters"></div><script type="text/javascript">document.addEventListener("DOMContentLoaded",function(){"function"==typeof initReactApp&&initReactApp()})</script>{% verbatim %}<script type="text/babel">function initReactApp() {
             const { useState, useEffect } = React;
             const options = {
                 method: 'GET',
@@ -84,7 +61,7 @@
             const App = () => {
                 const [sortOption, setSortOption] = React.useState('popularity.desc');
                 const [movies, setMovies] = useState([]);
-                let [topIndex, setTopIndex] = useState(0);
+                const [topIndex, setTopIndex] = useState(0);
                 const [bottomIndex, setBottomIndex] = useState(1);
                 const [startX, setStartX] = useState(0);
                 const [currentX, setCurrentX] = useState(0);
@@ -115,6 +92,7 @@
                     { id: 10752, name: "War" },
                     { id: 37, name: "Western" }
                 ];
+                let movieCounter = 0;  // Initialize a counter
 
                 const [genreOption, setGenreOption] = useState([]);   // Change this line to an array
         
@@ -122,23 +100,36 @@
 
                 const handleLikedClick = (movie) => {
                     sendSwipeDataToServer(movie, false, false, true, false)
-                        .then(() => moveToNextMovie())
-                        .catch(error => console.error('Error sending swipe data:', error));
+                        .then(() => {
+                            moveToNextMovie();
+                            movieCounter--;
+                            console.log('Movie counter:', movieCounter);
+                            if (movieCounter === 0) {
+                                fetchMovies();
+                            }
+                        });
                 };
-                
 
                 const handleDislikedClick = (movie) => {
                     sendSwipeDataToServer(movie, false, false, false, true)
-                    .then(() => moveToNextMovie())
-                    .catch(error => console.error('Error sending swipe data:', error));
+                        .then(() => {
+                            moveToNextMovie();
+                            movieCounter--;
+                            console.log('Movie counter:', movieCounter);
+                            if (movieCounter === 0) {
+                                fetchMovies();
+                            }
+                        });
                 };
-
                 const moveToNextMovie = () => {
                     setTopIndex(prevTopIndex => {
                         let newTopIndex = prevTopIndex + 1;
-                        if (newTopIndex === movies.length - 1) {
-                            console.log('Reached the end of the movies array');
-                            fetchMovies();  // Fetch new movies when reaching the end
+                        if (newTopIndex >= filteredMovies.length) {
+                            console.log('Reached the end of the filtered movies array');
+                            newTopIndex = prevTopIndex;  // Return the previous index if we've reached the end of the array
+                        }
+                        if (newTopIndex > filteredMovies.length - 3) {
+                            fetchMovies();
                         }
                         return newTopIndex;
                     });
@@ -149,49 +140,53 @@
                     moveToNextMovie();
                 };
 
-            const [userMovies, setUserMovies] = useState([]);
-            const [lastFetchedPage, setLastFetchedPage] = useState(1);
-                
-            const fetchMovies = (page = lastFetchedPage) => {
-                return new Promise((resolve, reject) => {
-                console.log('Fetching page:', page);
-                console.log('Fetch options:', options);
-                const currentTime = new Date().getTime();
-                if (currentTime - lastFetchTime >= 1) {
-                    fetch('/movie_match/user_movies')
+                const [userMovies, setUserMovies] = useState([]);
+
+                const fetchUserMovies = () => {
+                    return fetch('/movie_match/user_movies')
                         .then(response => response.json())
                         .then(userMovies => {
                             setUserMovies(userMovies);
-                            const genreParam = genreOption.length > 0 ? `&with_genres=${genreOption.join(',')}` : '';
-                            fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&page=${page}&language=en-US&sort_by=${sortOption}${genreParam}`, options)
-                                .then(response => response.json())
-                                .then(data => {
-                                    const moviesToDisplay = data.results.filter(movie => !userMovies.includes(movie.id));
-                                    console.log('Fetched movies:', data.results);
-                                    console.log('Filtered movies:', moviesToDisplay);
-                                    if (moviesToDisplay.length <= 1 && page < data.total_pages) {
-                                        console.log('Not enough movies match the selected genres. Fetching more movies.');
-                                        fetchMovies(page + 1);
-                                    } else {
-                                        setMovies(prevMovies => [...prevMovies, ...moviesToDisplay]);
-                                        setLastFetchTime(currentTime);
-                                        setLastFetchedPage(page);  // Update the last fetched page
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
+                            console.log('User movies:', userMovies);
+                            fetchMovies();  // Fetch movies after userMovies has been updated
                         })
                         .catch(error => {
                             console.error('Error:', error);
                         });
                 };
-            });
-            };
+
+                const fetchMovies = (page = 1) => {
+                    console.log('Fetching page:', page);
+                    console.log('Fetch options:', options);
+                    const currentTime = new Date().getTime();
+                    if (currentTime - lastFetchTime >= 1) {
+                        const genreParam = genreOption.length > 0 ? `&with_genres=${genreOption.join(',')}` : '';
+                        fetch(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&page=${page}&language=en-US&sort_by=${sortOption}${genreParam}`, options)
+                            .then(response => response.json())
+                            .then(data => {
+                                const moviesToDisplay = data.results.filter(movie => !userMovies.includes(movie.id));
+                                console.log('Fetched movies:', data.results);
+                                console.log('Filtered movies:', moviesToDisplay);
+                                movieCounter = moviesToDisplay.length;
+                                console.log('Movie counter:', movieCounter);
+                                if (movieCounter <= 1 && page < data.total_pages) {
+                                    console.log('Not enough movies match the selected genres. Fetching more movies.');
+                                    fetchMovies(page + 1);
+                                } else {
+                                    setMovies(prevMovies => [...prevMovies, ...moviesToDisplay]);
+                                    setLastFetchTime(currentTime);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    }
+                };
 
                 window.applyFetch = function() {
                     console.log('Selected genres:', genreOption);
                     setMovies([]);  // Clear the existing movies
+                    movieCounter = 0;  // Reset the counter
                     fetchMovies();  // Fetch new movies starting from page 1
                 }
         
@@ -205,24 +200,16 @@
                     });
                 };
 
-                const [loading, setLoading] = useState(false);
-
-                // Fetch movies when the component mounts
                 useEffect(() => {
-                    setLoading(true);
-                    fetchMovies().then(() => setLoading(false));
-                }, []); // Empty dependency array means this effect runs once on mount
+                    fetchUserMovies();
+                }, []);
 
                 useEffect(() => {
-                    // Filter out the user's movies
-                    const filteredMovies = movies.filter(movie => !userMovies.includes(movie.id));
-
-                    // Only fetch movies if there are no movies left to display
-                    if (filteredMovies.length === 0 && !loading) {
-                        setLoading(true);
-                        fetchMovies().then(() => setLoading(false));
+                    if (userMovies.length > 0) {
+                        fetchMovies();
                     }
-                }, [movies, userMovies, loading]); // Add loading to the dependency array
+                }, [userMovies]);
+
                 
                 // Filter out the user's movies
                 const filteredMovies = movies.filter(movie => !userMovies.includes(movie.id));
@@ -302,9 +289,11 @@
                     const swipeDistance = Math.abs(currentX - startX);
                     console.log('Swipe distance:', swipeDistance);
                 
-                    if (swipeDistance > 200 || topIndex === filteredMovies.length - 1) {
+                    if (swipeDistance > 200) {
                         console.log('Meaningful swipe detected');
-                    
+                        movieCounter--;
+                        console.log('Movie counter:', movieCounter);
+                
                         // Determine swipe direction
                         let isInterested;
                         let isNotInterested;
@@ -315,35 +304,37 @@
                             console.log('Swipe left');
                             isNotInterested = true;
                         }
-                    
+                
                         setIsMeaningfulSwipe(true);
-                    
-                        setBottomIndex(prevTopIndex => prevTopIndex + 1);
-                    
-                        let newTopIndex = topIndex + 1;
-                        console.log('Current top index:', newTopIndex);  // Debugging log
-                        console.log('Filtered movies length:', filteredMovies.length/2);  // Debugging log
 
-                        if (newTopIndex >= filteredMovies.length/2) {
-                            topIndex = 0;
-                            newTopIndex = 0;
+                        setBottomIndex(prevTopIndex => prevTopIndex + 1);
+                
+                        let newTopIndex = topIndex + 1;
+                        if (newTopIndex >= filteredMovies.length) {
                             console.log('Reached the end of the filtered movies array');
+                            newTopIndex = topIndex;  // Return the previous index if we've reached the end of the array
+                        }
+                        if (newTopIndex > filteredMovies.length - 3) {
                             fetchMovies();
                         }
                         console.log('New top index:', newTopIndex);  // Debugging log
-                    
+                
                         const movie = filteredMovies[newTopIndex - 1];
                         if (movie) {
                             let isLiked = isInterested;
                             let isDisliked = !isInterested;
                             sendSwipeDataToServer(movie, false, false, isLiked, isDisliked);
                         }
-                    
-                        setTopIndex(prevTopIndex => prevTopIndex + 1);
+
+                        if (movieCounter === 0) {
+                            fetchMovies();
+                        }
+                
+                        setTopIndex(newTopIndex);
                     } else {
                         console.log('Not a meaningful swipe');
                         setIsMeaningfulSwipe(false);
-                    }                    
+                    }
                 
                     setIsSwiping(false);
                     setStartX(0);
@@ -358,50 +349,42 @@
                 
                 const sendSwipeDataToServer = (movie, isInterested, isNotInterested, liked, disliked) => {
                     // Include the movieId in the URL
-                    return fetch(`/movie_match/save_movie_data/${movie.id}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            isInterested,
-                            isNotInterested,
-                            seenLiked: liked,
-                            seenDisliked: disliked,
-                            movieId: movie.id,
-                            title: movie.title,
-                            overview: movie.overview,
-                            release_date: movie.release_date,
-                            popularity: movie.popularity,
-                            vote_average: movie.vote_average,
-                            original_language: movie.original_language,
-                            original_title: movie.original_title,
-                            genre_ids: movie.genre_ids,
-                            backdrop_path: movie.backdrop_path,
-                            poster_path: movie.poster_path,
-                            video: movie.video,
-                            vote_count: movie.vote_count,
-                            adult: movie.adult
-                            // Add any other properties you wish to send
-                        })
+                    fetch(`/movie_match/save_movie_data/${movie.id}/`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        isInterested,
+                        isNotInterested,
+                        seenLiked: liked,
+                        seenDisliked: disliked,
+                        movieId: movie.id,
+                        title: movie.title,
+                        overview: movie.overview,
+                        release_date: movie.release_date,
+                        popularity: movie.popularity,
+                        vote_average: movie.vote_average,
+                        original_language: movie.original_language,
+                        original_title: movie.original_title,
+                        genre_ids: movie.genre_ids,
+                        backdrop_path: movie.backdrop_path,
+                        poster_path: movie.poster_path,
+                        video: movie.video,
+                        vote_count: movie.vote_count,
+                        adult: movie.adult
+                        // Add any other properties you wish to send
+                      })
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Server responded with status ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         console.log("Sending movie to server:", movie);
                         console.log('Successfully sent swipe data:', data);
-                        return data; // Pass the data to the next `.then` block
                     })
                     .catch(err => {
                         console.error('Failed to send swipe data:', err);
-                        throw err; // Rethrow the error for further handling
                     });
-                };
-                
+                  };
                   
                 const filtersDiv = document.getElementById('filters');
                 if (filtersDiv) {
@@ -486,38 +469,4 @@
 
         if (document.readyState === 'complete' || (document.readyState !== 'loading' && !document.documentElement.doScroll)) {
             initReactApp();
-        }
-    </script>
-    
-    {% endverbatim %}
-			</div>
-		</div>
-	</div>
-	<!-- Page Content End -->
-    
-	<!--  Setting OffCanvas -->
-
-	<!--  Setting OffCanvas -->
-    {% else %}
-        <!-- Page Content for Unauthenticated Users -->
-        <div class="page-content space-top p-b65">
-            <div class="container fixed-full-area">
-                <h2>Please log in</h2>
-                <div id="login-form" style="display: block;">
-                    <!-- Existing login form -->
-                    <form action="{% url 'login' %}" method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <input autofocus class="form-control" type="text" name="username" placeholder="Username">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="password" name="password" placeholder="Password">
-                        </div>
-                        <input class="btn btn-primary" type="submit" value="Login">
-                    </form>
-                    Don't have an account? <a href="{% url 'register' %}" class="fw-bold">Register here.</a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
+        }</script>{% endverbatim %}<!-- Page Content End --><!--  Setting OffCanvas --><!--  Setting OffCanvas --> {% else %}<!-- Page Content for Unauthenticated Users --><div class="page-content space-top p-b65"><div class="container fixed-full-area"><h2>Please log in</h2><div id="login-form" style="display:block"><!-- Existing login form --><form action="{% url 'login' %}" method="post">{% csrf_token %}<div class="form-group"><input autofocus class="form-control" type="text" name="username" placeholder="Username"></div><div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password"></div><input class="btn btn-primary" type="submit" value="Login"></form>Don't have an account? <a href="{% url 'register' %}" class="fw-bold">Register here.</a></div></div></div>{% endif %} {% endblock %}
