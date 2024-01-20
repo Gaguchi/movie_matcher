@@ -57,7 +57,7 @@
 					<div class="dz-content">
 						<div class="left-content style-2">
 							<span class="badge style-3 mb-2">Release Date: {movie.release_date}</span>
-                            <h4 class="title"><a href={`movie_match/movie_profile/${movie.id}`}>{movie.title}</a></h4>
+                            <h4 class="title"><a href={`/movie_match/movie_profile/${movie.id}`}>{movie.title}</a></h4>
 							<p><i class="icon feather icon-map-pin"></i>Vote Average: {movie.vote_average}</p>		
                             <div class="meta-btn">
                                 <a href="javascript:void(0);" class="btn btn-danger rounded-xl w-100" onClick={() => onDislikedClick(movie)}>
@@ -298,53 +298,54 @@
                 const handleEnd = (e) => {
                     e.stopPropagation();
                     console.log('handleEnd triggered');
-                
+
                     const swipeDistance = Math.abs(currentX - startX);
                     console.log('Swipe distance:', swipeDistance);
-                
+
                     if (swipeDistance > 200 || topIndex === filteredMovies.length - 1) {
                         console.log('Meaningful swipe detected');
-                    
+
                         // Determine swipe direction
                         let isInterested;
                         let isNotInterested;
                         if (currentX > startX) {
                             console.log('Swipe right');
                             isInterested = true;
+                            isNotInterested = false;
                         } else {
                             console.log('Swipe left');
                             isNotInterested = true;
+                            isInterested = false;
                         }
-                    
+
                         setIsMeaningfulSwipe(true);
-                    
+
                         setBottomIndex(prevTopIndex => prevTopIndex + 1);
-                    
+
                         let newTopIndex = topIndex + 1;
                         console.log('Current top index:', newTopIndex);  // Debugging log
                         console.log('Filtered movies length:', filteredMovies.length/2);  // Debugging log
 
                         if (newTopIndex >= filteredMovies.length/2) {
-                            topIndex = 0;
                             newTopIndex = 0;
                             console.log('Reached the end of the filtered movies array');
                             fetchMovies();
                         }
                         console.log('New top index:', newTopIndex);  // Debugging log
-                    
+
                         const movie = filteredMovies[newTopIndex - 1];
                         if (movie) {
                             let isLiked = isInterested;
                             let isDisliked = !isInterested;
-                            sendSwipeDataToServer(movie, false, false, isLiked, isDisliked);
+                            sendSwipeDataToServer(movie, isInterested, isNotInterested, isLiked, isDisliked);
                         }
-                    
+
                         setTopIndex(prevTopIndex => prevTopIndex + 1);
                     } else {
                         console.log('Not a meaningful swipe');
                         setIsMeaningfulSwipe(false);
                     }                    
-                
+
                     setIsSwiping(false);
                     setStartX(0);
                     setCurrentX(0);

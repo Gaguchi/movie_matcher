@@ -8302,3 +8302,23 @@ button.active {
 .btn:hover, .btn:focus, .btn:active {
   color: #4e4e4e;
 }
+
+.movie-profile-poster{
+  max-width: 200px;
+  border-style: solid;
+  border-color: white;
+  margin-bottom: 5px;
+  box-shadow: 3px 3px 4px black;
+  border-radius: 10px;
+}
+
+h2.movie-title {
+  color: white;
+}
+
+.movie-info {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 10px;
+  padding: 20px;
+}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Movie
+from .models import Movie, User
 
 class MovieAdmin(admin.ModelAdmin):
     list_display = ['title', 'movie_id', 'original_language', 'release_date', 'vote_average']
@@ -8,3 +8,4 @@ class MovieAdmin(admin.ModelAdmin):
     ordering = ['-release_date']
 
 admin.site.register(Movie, MovieAdmin)
+admin.site.register(User)

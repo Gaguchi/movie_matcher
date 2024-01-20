@@ -25,12 +25,13 @@ class Movie(models.Model):
 
 class User(AbstractUser):
     friends = models.ManyToManyField('self', related_name='friend_set', symmetrical=True, blank=True)
-    movies_interested = models.ManyToManyField(Movie, related_name='interested_users', blank=True)
-    movies_not_interested = models.ManyToManyField(Movie, related_name='not_interested_users', blank=True)
-    movies_liked = models.ManyToManyField(Movie, related_name='liked_by_users', blank=True)
-    movies_disliked = models.ManyToManyField(Movie, related_name='disliked_by_users', blank=True)
-    movies_neutral = models.ManyToManyField(Movie, related_name='neutral_users', blank=True)
-    
+
+    movies_interested = models.ManyToManyField('Movie', related_name='interested_users', blank=True)
+    movies_not_interested = models.ManyToManyField('Movie', related_name='not_interested_users', blank=True)
+    movies_liked = models.ManyToManyField('Movie', related_name='liked_by_users', blank=True)
+    movies_disliked = models.ManyToManyField('Movie', related_name='disliked_by_users', blank=True)
+    movies_neutral = models.ManyToManyField('Movie', related_name='neutral_users', blank=True)
+
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
@@ -39,6 +40,7 @@ class User(AbstractUser):
         related_name="custom_user_groups",
         related_query_name="user",
     )
+
     user_permissions = models.ManyToManyField(
         Permission,
         verbose_name='user permissions',
@@ -50,3 +52,4 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
