@@ -23,7 +23,7 @@ After the movies are fetched (and with filter options applied) they are checked 
 
 The successfully fetched and filtered movie data is passed on to the page and the data is used to display the movie cards for the user to interact with. If the user is interested in the movie they can swipe left to save the movie to their interested list, to the right if they aren't interested in the movie, or they can click either of the 'seen:liiked' or the 'seen:disliked' buttons if their have already seen the movie and liked it or disliked it. Each interaction is kept track of and when the number of interaction (either swipes of clicks) is equal to the amount of displayed movies in the current batch the next batch if fetche. The user then can continue interacting with the movies or use one of our games to help them choose with movie they should watch.
 
-One of such games is what i call 'The wheel of movies'. 
+One of such games is what i call 'The wheel of movies'. When the wheel is loaded it 
  
 # Files
 ## views.py (in this file we handle the data we get from the TMDB api as well as generate our own api to make working with our wheel and Plinko easier)
