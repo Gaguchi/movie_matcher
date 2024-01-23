@@ -26,27 +26,31 @@ The successfully fetched and filtered movie data is passed on to the page and th
 One of such games is what i call 'The wheel of movies'. When the wheel page is loaded the movie data is sent to through the wheel_of_movies view, we use that movie data to fill out the wheel sections. Up to 8 movies that the user is interested in is displayed to the user on the wheel. Below the wheel we render a modal that is hidden until a winning movie is determined, more datail about the workings of the wheen of movies can be found in the files section below. Note that even though we render a indicator it is purely for UX reasons so the users have a static object to better see which movie the wheel settled upon. 
 
 The other game that we have is our version of Plinko. It's somewhat similar to the wheel in the fact that it also draws its data from a view and helps the user choose which movie to watch. The plinko game works like this: the user drop a ball down the plinko board (through cliking on the general are where they with to drop the ball), the ball them drops unto and bounces off pegs to land at the bottom into one of the secctions that contain movies. The ball dropping to the end triggers a modal  with the winning movie to appear similar to the wheel at which point the user either accepts to watch the movie and leaves feedback on whether they liked it or not or closes the modal to drop another ball.
+
+For more justification of distinctiveness and (especially) complexity please read through the files section.
  
 # Files
-## views.py (in this file we handle the data we get from the TMDB api as well as generate our own api to make working with our wheel and Plinko easier)
+These are the main files that we use to make our app work. Some are relatively simple (for example models.py just contains the relevant models) but some too significantly more work (like the "game" files: wheel.js and plinko.js). For simpler files ill write more briefly but ill write more details for more complex files.
 
-#### >  save_movie_data()
-Handles the saving of movie data and user preferences. Gets the movie data that is sent to it with a POST request, checkes wheres the movie is 'interested', 'not interested, 'seen and liked' or 'seen and disliked' and saves the movie accordingly. If the movie has already been saved it updates the 'interested', 'not interested, 'seen and liked' or 'seen and disliked', so that when the user watches the movie they can update it accordingly (fer example if the user marks a movie that was previousely in the 'interested' table with 'seen_liked' the movie is taken out of the 'interested' table and is placed in the 'seen and liked' table).
-
-#### >  wheel_of_movies()
-Renders a page displaying a wheel of movies based on the user's interested movies. On request sends up to 8 movies from the 'intrested' table in JSON format.
-
-#### >  plinko()
-Renders a page displaying a Plinko-style game with movies based on the user's interested movies.
-
-#### >  index()
-Renders the homepage.
-
-#### >  movie_profile
-Renders a page displaying details about a specific movie.
-
-#### >  user_movies
-Returns a JSON response containing all movies that the user has interacted with.
+## Here is the list of the most important files for our app:
+* Django files:
+  * **models.py**:
+    * contains models for our movies and users
+  * **views.py**:
+    * handles the standard views (like displaying the index page and other profile page) as well as saving the movie data correctly. The save_movie_data, upon a POST request, creates a movie object and saves it to the database. Upon save the movie is removed from the following tables
+       ```bash
+       movies_interested = models.ManyToManyField('Movie', related_name='interested_users', blank=True)
+       movies_not_interested = models.ManyToManyField('Movie', related_name='not_interested_users', blank=True)
+       movies_liked = models.ManyToManyField('Movie', related_name='liked_by_users', blank=True)
+       movies_disliked = models.ManyToManyField('Movie', related_name='disliked_by_users', blank=True)
+       movies_neutral = models.ManyToManyField('Movie', related_name='neutral_users', blank=True)
+       ```
+      and is added back to an appropriate table, this is done to make sure there are no duplicates because it wouldn't make sense for a movie to be in more than one of these tables. This file also handles sending of the movies data to the wheel and plinko pages (we are sending ```user.movies_interested``` to the pages and in the case of plinko we also send the amount or movies in int form that we then use to remind the user that they need to have at least 5 movies in their 'interested' table for the plinko game to activate.
+  * **urls.py**
+    * handles the urls for our app for simple page displays and api requests
+* Templates
+  * **index.html**
+    * 
 
 ## index.html (here we have the bulk of our React code)
 
