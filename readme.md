@@ -16,14 +16,16 @@ python manage.py runserver
 ```
 
 # Distinctiveness and Complexity
-
+ 
 I believe there are several factors that qualify this application for both distinctiveness and complexity. The app not only fetches movie data from a third party API it also generates its own and uses the generated API for fairly complex games. The react code in the index page first checkes whether the user is logged in or not (using djangos builtin authentication) after which it will fetch movies from the database (after checking of the active filters and applying those active filters) as well as the saved movies (movies that we saved by the user in the database as 'interested','not interested','liked','disliked'). We also check if the images are loaded correctly and if there is an error with the images the movies is skipped (this was added to improve user experience).
 
 After the movies are fetched (and with filter options applied) they are checked against the saved movies (movies that the user already interacted with) and we filter out movies that the user has already interacted with. The database allows fetching movies in batches of 20. After the first batch is fetched but all the movies have already been interacted with by the user, and thereby have been filtered out, we iterate the page by one and keep fetching until a new movie that the user hasn't yet interacted with appears.
 
 The successfully fetched and filtered movie data is passed on to the page and the data is used to display the movie cards for the user to interact with. If the user is interested in the movie they can swipe left to save the movie to their interested list, to the right if they aren't interested in the movie, or they can click either of the 'seen:liiked' or the 'seen:disliked' buttons if their have already seen the movie and liked it or disliked it. Each interaction is kept track of and when the number of interaction (either swipes of clicks) is equal to the amount of displayed movies in the current batch the next batch if fetche. The user then can continue interacting with the movies or use one of our games to help them choose with movie they should watch.
 
-One of such games is what i call 'The wheel of movies'. When the wheel is loaded it 
+One of such games is what i call 'The wheel of movies'. When the wheel page is loaded the movie data is sent to through the wheel_of_movies view, we use that movie data to fill out the wheel sections. Up to 8 movies that the user is interested in is displayed to the user on the wheel. Below the wheel we render a modal that is hidden until a winning movie is determined, more datail about the workings of the wheen of movies can be found in the files section below. Note that even though we render a indicator it is purely for UX reasons so the users have a static object to better see which movie the wheel settled upon. 
+
+The other game that we have is our version of Plinko. It's somewhat similar to the wheel in the fact that it also draws its data from a view and 
  
 # Files
 ## views.py (in this file we handle the data we get from the TMDB api as well as generate our own api to make working with our wheel and Plinko easier)
