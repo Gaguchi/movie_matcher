@@ -25,7 +25,7 @@ The successfully fetched and filtered movie data is passed on to the page and th
 
 One of such games is what i call 'The wheel of movies'. When the wheel page is loaded the movie data is sent to through the wheel_of_movies view, we use that movie data to fill out the wheel sections. Up to 8 movies that the user is interested in is displayed to the user on the wheel. Below the wheel we render a modal that is hidden until a winning movie is determined, more datail about the workings of the wheen of movies can be found in the files section below. Note that even though we render a indicator it is purely for UX reasons so the users have a static object to better see which movie the wheel settled upon. 
 
-The other game that we have is our version of Plinko. It's somewhat similar to the wheel in the fact that it also draws its data from a view and 
+The other game that we have is our version of Plinko. It's somewhat similar to the wheel in the fact that it also draws its data from a view and helps the user choose which movie to watch. The plinko game works like this: the user drop a ball down the plinko board (through cliking on the general are where they with to drop the ball), the ball them drops unto and bounces off pegs to land at the bottom into one of the secctions that contain movies. The ball dropping to the end triggers a modal  with the winning movie to appear similar to the wheel at which point the user either accepts to watch the movie and leaves feedback on whether they liked it or not or closes the modal to drop another ball.
  
 # Files
 ## views.py (in this file we handle the data we get from the TMDB api as well as generate our own api to make working with our wheel and Plinko easier)
