@@ -50,7 +50,7 @@ These are the main files that we use to make our app work. Some are relatively s
     * handles the urls for our app for simple page displays and api requests
 * Templates
   * **index.html**
-    * 
+    * This file first check if the user is logged in and if not the user is presented with a login form and a link to the registration form.
 
 ## index.html (here we have the bulk of our React code)
 
