@@ -1,311 +1,119 @@
-
 var winningMovieData = null;
-
 class Peg {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.radius = 5;
+    constructor(t, i) {
+        this.x = t, this.y = i, this.radius = 5
     }
-
-    draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#000';
-        ctx.fill();
+    draw(t) {
+        t.beginPath(), t.arc(this.x, this.y, this.radius, 0, 2 * Math.PI), t.fillStyle = "#000", t.fill()
     }
 }
-
 class Ball {
-    constructor(x, y) {
-        this.x = x;
-        this.y = 70;
-        this.radius = 5;
-        this.vx = 0;
-        this.vy = 0;
-        this.gravity = 0.2;  // Increase gravity
-        this.friction = 0.98;  // Increase friction
-        this.bounciness = 0.9;  // Decrease bounciness
-        this.hitBottom = false;  // Add this line
+    constructor(t, i) {
+        this.x = t, this.y = 70, this.radius = 5, this.vx = 0, this.vy = 0, this.gravity = .2, this.friction = .98, this.bounciness = .9, this.hitBottom = !1
     }
-
     update() {
-        this.vy += this.gravity;
-        this.vx *= this.friction;  // Apply friction
-        this.vy *= this.friction;  // Apply friction
-        this.x += this.vx;
-        this.y += this.vy;
-        
-        // Prevent the ball from going below the bottom of the canvas
-        if (this.y + this.radius > canvas.height) {
-            this.y = canvas.height - this.radius;
-            this.vy *= -1;
-        }
+        this.vy += this.gravity, this.vx *= this.friction, this.vy *= this.friction, this.x += this.vx, this.y += this.vy, this.y + this.radius > canvas.height && (this.y = canvas.height - this.radius, this.vy *= -1)
     }
-
     bounce() {
-        this.vx *= this.bounciness;  // Apply bounciness
-        this.vy *= -this.bounciness;  // Apply bounciness
+        this.vx *= this.bounciness, this.vy *= -this.bounciness
     }
-
-    draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#f00';
-        ctx.fill();
+    draw(t) {
+        t.beginPath(), t.arc(this.x, this.y, this.radius, 0, 2 * Math.PI), t.fillStyle = "#f00", t.fill()
     }
 }
-
 class Plinko {
-    constructor(canvas, movies) {  // Add movies parameter here
-        console.log('Initializing Plinko game');  // Debugging log
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.pegs = [];
-        this.balls = [];
-        this.sections = 5;  // Number of sections
-        this.movies = movies;  // Add this line
-        this.logged = false;  // Add this line
-        this.createPegs();
-        this.sectionWidth = 68 ;  // Initial section width
-        this.sectionHeight = 102 ;  // Initial section height
-        this.sectionX = 0;  // Initial x position
-        this.sectionY = 399;  // Initial y position
-
-        // Load the image
-        this.images = [];
-        if (Array.isArray(this.movies)) {
-            for (let i = 0; i < this.movies.length; i++) {
-                const img = new Image();
-                img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[i].fields.poster_path;
-                this.images.push(img);
+    constructor(t, i) {
+        if (console.log("Initializing Plinko game"), this.canvas = t, this.ctx = t.getContext("2d"), this.pegs = [], this.balls = [], this.sections = 5, this.movies = i, this.logged = !1, this.createPegs(), this.sectionWidth = 68, this.sectionHeight = 102, this.sectionX = 0, this.sectionY = 399, this.images = [], Array.isArray(this.movies))
+            for (let t = 0; t < this.movies.length; t++) {
+                const i = new Image;
+                i.src = "https://image.tmdb.org/t/p/w500" + this.movies[t].fields.poster_path, this.images.push(i)
             }
-        }
     }
-
     drawWalls() {
-        // Draw the images
-        for (let i = 0; i < this.sections; i++) {
-            // Check if an image exists and has loaded
-            if (i < this.images.length && this.images[i].complete) {
-                // Draw the image in the section
-                this.ctx.drawImage(this.images[i], this.sectionX + i * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight);
-
-                // Draw a semi-transparent rectangle on top of the image
-                this.ctx.fillStyle = 'rgba(0, 0, 255, 0)';  // Semi-transparent blue
-                this.ctx.fillRect(this.sectionX + i * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight);
-            }
-        }
+        for (let t = 0; t < this.sections; t++) t < this.images.length && this.images[t].complete && (this.ctx.drawImage(this.images[t], this.sectionX + t * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight), this.ctx.fillStyle = "rgba(0, 0, 255, 0)", this.ctx.fillRect(this.sectionX + t * this.sectionWidth, this.sectionY, this.sectionWidth, this.sectionHeight))
     }
-    
-    redrawSections(newMovies) {
-        // Update the movies
-        this.movies = newMovies;
-
-        // Update the images
-        this.images = [];
-        for (let i = 0; i < this.movies.length; i++) {
-            // Check if the movie object and its fields property are defined
-            if (this.movies[i] && this.movies[i].fields) {
-                const img = new Image();
-                img.src = 'https://image.tmdb.org/t/p/w500' + this.movies[i].fields.poster_path;
-                img.onload = () => this.drawWalls();  // Redraw the sections when the image has loaded
-                this.images.push(img);
-            }
-        }
-
-        // Clear the canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Redraw the sections
-        this.drawWalls();
-
-        // Redraw the pegs
-        for (let i = 0; i < this.pegs.length; i++) {
-            this.pegs[i].draw(this.ctx);
-        }
-
-        // Redraw the balls
-        for (let i = 0; i < this.balls.length; i++) {
-            this.balls[i].draw(this.ctx);
-        }
+    redrawSections(t) {
+        this.movies = t, this.images = [];
+        for (let t = 0; t < this.movies.length; t++)
+            if (this.movies[t] && this.movies[t].fields) {
+                const i = new Image;
+                i.src = "https://image.tmdb.org/t/p/w500" + this.movies[t].fields.poster_path, i.onload = (() => this.drawWalls()), this.images.push(i)
+            } this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height), this.drawWalls();
+        for (let t = 0; t < this.pegs.length; t++) this.pegs[t].draw(this.ctx);
+        for (let t = 0; t < this.balls.length; t++) this.balls[t].draw(this.ctx)
     }
-
     updateMoviesData() {
-        this.redrawSections();
+        this.redrawSections()
     }
-
     createPegs() {
-        const rows = 12;
-        const cols = 11;
-        const spacing = 30;
-        const offsetX = 0;  // Add an offset to the x position of the pegs
-        const offsetY = 10;  // Add an offset to the y position of the pegs
-    
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let x = col * spacing + spacing / 2 + offsetX;  // Add the offset here
-                let y = row * spacing + spacing / 2 + offsetY;  // Add the offset here
-                if (row % 2 === 0) {
-                    x += spacing / 2;
-                }
-                this.pegs.push(new Peg(x, y));
+        const t = 12,
+            i = 11,
+            s = 30,
+            e = 0,
+            h = 10;
+        for (let a = 0; a < t; a++)
+            for (let t = 0; t < i; t++) {
+                let i = t * s + s / 2 + e,
+                    o = a * s + s / 2 + h;
+                a % 2 == 0 && (i += s / 2), this.pegs.push(new Peg(i, o))
             }
-        }
     }
-
-    addBall(x, y) {
-        this.balls.push(new Ball(x, y));
+    addBall(t, i) {
+        this.balls.push(new Ball(t, i))
     }
-
     update() {
-        const sectionWidth = this.canvas.width / this.sections;
-    
-
-        for (const ball of this.balls) {
-            ball.update();
-
-            for (const peg of this.pegs) {
-                const dx = ball.x - peg.x;
-                const dy = ball.y - peg.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < ball.radius + peg.radius) {
-                    const angle = Math.atan2(dy, dx);
-                    const sin = Math.sin(angle);
-                    const cos = Math.cos(angle);
-
-                    // Rotate the ball's velocity to bounce it off the peg
-                    let vx1 = ball.vx * cos + ball.vy * sin;
-                    let vy1 = ball.vy * cos - ball.vx * sin;
-
-                    vx1 *= -1;  // Bounce the ball in the x direction
-
-                    // Rotate the ball's velocity back
-                    ball.vx = vx1 * cos - vy1 * sin;
-                    ball.vy = vy1 * cos + vx1 * sin;
-
-                    ball.bounce();  // Apply bounciness
-
-                    // Move the ball outside the peg
-                    const overlap = ball.radius + peg.radius - distance;
-                    ball.x += overlap * cos;
-                    ball.y += overlap * sin;
+        const t = this.canvas.width / this.sections;
+        for (const i of this.balls) {
+            i.update();
+            for (const t of this.pegs) {
+                const s = i.x - t.x,
+                    e = i.y - t.y,
+                    h = Math.sqrt(s * s + e * e);
+                if (h < i.radius + t.radius) {
+                    const a = Math.atan2(e, s),
+                        o = Math.sin(a),
+                        n = Math.cos(a);
+                    let l = i.vx * n + i.vy * o,
+                        r = i.vy * n - i.vx * o;
+                    l *= -1, i.vx = l * n - r * o, i.vy = r * n + l * o, i.bounce();
+                    const c = i.radius + t.radius - h;
+                    i.x += c * n, i.y += c * o
                 }
             }
-
-            if (ball.x + ball.radius > this.canvas.width || ball.x - ball.radius < 0) {
-                ball.vx *= -1;
+            if ((i.x + i.radius > this.canvas.width || i.x - i.radius < 0) && (i.vx *= -1), i.y + i.radius > this.canvas.height && i.bounce(), !i.hitBottom && i.y + i.radius > this.canvas.height - 50) {
+                const s = Math.floor(i.x / t);
+                console.log("Ball in section:", s + 1), i.hitBottom = !0
             }
-
-            if (ball.y + ball.radius > this.canvas.height) {
-                ball.bounce();  // Make the ball bounce
-            }
-
-            // Check if the ball has reached the bottom of the canvas
-            if (!ball.hitBottom && ball.y + ball.radius > this.canvas.height - 50) {
-                // Calculate which section the ball is in
-                const section = Math.floor(ball.x / sectionWidth);
-    
-                // Log the section number to the console
-                console.log('Ball in section:', section + 1);
-    
-                // Mark the ball as having hit the bottom
-                ball.hitBottom = true;
-            }
-            // Check collision with lines
-            for (let i = 1; i < this.sections; i++) {
-                if (ball.y + ball.radius > this.canvas.height - 50 && ball.x > i * sectionWidth && ball.x < (i * sectionWidth + 10)) {
-                    ball.vx *= -1;
-                }
-            }
-            // Update the balls
-            for (let i = 0; i < this.balls.length; i++) {
-                this.balls[i].update();
-        
-                // Check if the ball has reached the bottom of the canvas
-                if (this.balls[i].y + this.balls[i].radius >= this.canvas.height) {
-                    // Determine the winning section
-                    this.determineWinningSection(this.balls[i]);
-        
-                    // Remove the ball from the array
-                    this.balls.splice(i, 1);
-        
-                    // Decrement i to account for the removed ball
-                    i--;
-                }
-            }
+            for (let s = 1; s < this.sections; s++) i.y + i.radius > this.canvas.height - 50 && i.x > s * t && i.x < s * t + 10 && (i.vx *= -1);
+            for (let t = 0; t < this.balls.length; t++) this.balls[t].update(), this.balls[t].y + this.balls[t].radius >= this.canvas.height && (this.determineWinningSection(this.balls[t]), this.balls.splice(t, 1), t--)
         }
     }
-
     draw() {
-        // Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Draw the pegs
-        for (let i = 0; i < this.pegs.length; i++) {
-            this.pegs[i].draw(this.ctx);
-        }
-
-        // Draw the balls
-        for (let i = 0; i < this.balls.length; i++) {
-            this.balls[i].draw(this.ctx);
-        }
-
-        // Draw the walls
-        this.drawWalls();  // Move this line to the end
+        for (let t = 0; t < this.pegs.length; t++) this.pegs[t].draw(this.ctx);
+        for (let t = 0; t < this.balls.length; t++) this.balls[t].draw(this.ctx);
+        this.drawWalls()
     }
     loop() {
-        this.update();
-        this.draw();
-        requestAnimationFrame(() => this.loop());
+        this.update(), this.draw(), requestAnimationFrame(() => this.loop())
     }
-
-    determineWinningSection(ball) {
-        // Check if the ball is undefined
-        if (!ball) {
-            console.error('determineWinningSection was called with an undefined ball');
-            return;
-        }
-
-        // Determine the winning section
-        const sectionWidth = this.canvas.width / this.sections;
-        const winningSection = Math.floor(ball.x / sectionWidth);
-
-        // Get the winning movie
-        const winningMovie = this.movies[winningSection];
-
-        // Check if the winning movie is defined
-        if (winningMovie) {
-            winningMovieData = winningMovie
-
-            // Log the winning section and movie
-            console.log('Winning section:', winningSection);
-            console.log('Winning movie:', winningMovie.fields.title);
-            var modal = document.getElementById('exampleModalCenter');
-            let movieLink = modal.querySelector('.movie-link');
-            if (movieLink) {
-                movieLink.textContent = winningMovie.fields.title;
-                movieLink.href = `../movie_profile/`+ winningMovie.fields.movie_id+`/`;
-            } else {
-                console.error('Error: .movie-link element not found');
-            }
-            modal.querySelector('.lead').textContent = winningMovie.fields.overview;
-            modal.querySelector('.text-muted').textContent = winningMovie.fields.release_date;
-            modal.querySelector('.modal-image').src = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2' + winningMovie.fields.poster_path;
-            modal.querySelector('.modal-content').style.background = 'url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces' + winningMovie.fields.backdrop_path +')';
-            var modalInstance = new bootstrap.Modal(modal);
-            modalInstance.show();
-        } else {
-            console.error('No movie data for section:', winningSection);
-        }
+    determineWinningSection(t) {
+        if (!t) return void console.error("determineWinningSection was called with an undefined ball");
+        const i = this.canvas.width / this.sections,
+            s = Math.floor(t.x / i),
+            e = this.movies[s];
+        if (e) {
+            winningMovieData = e, console.log("Winning section:", s), console.log("Winning movie:", e.fields.title);
+            var h = document.getElementById("exampleModalCenter");
+            let t = h.querySelector(".movie-link");
+            t ? (t.textContent = e.fields.title, t.href = "../movie_profile/" + e.fields.movie_id + "/") : console.error("Error: .movie-link element not found"), h.querySelector(".lead").textContent = e.fields.overview, h.querySelector(".text-muted").textContent = e.fields.release_date, h.querySelector(".modal-image").src = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + e.fields.poster_path, h.querySelector(".modal-content").style.background = "url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces" + e.fields.backdrop_path + ")";
+            var a = new bootstrap.Modal(h);
+            a.show()
+        } else console.error("No movie data for section:", s)
     }
 }
-
-const canvas = document.querySelector('canvas');
-const plinko = new Plinko(canvas);
-plinko.loop();
-
-canvas.addEventListener('click', (event) => {
-    plinko.addBall(event.clientX, event.clientY);
+const canvas = document.querySelector("canvas"),
+    plinko = new Plinko(canvas);
+plinko.loop(), canvas.addEventListener("click", t => {
+    plinko.addBall(t.clientX, t.clientY)
 });

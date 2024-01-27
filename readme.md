@@ -50,42 +50,4 @@ These are the main files that we use to make our app work. Some are relatively s
     * handles the urls for our app for simple page displays and api requests
 * Templates
   * **index.html**
-    * This file first check if the user is logged in and if not the user is presented with a login form and a link to the registration form. After it is confirmed that the user is authenticated and the domcontent is loaded we initiate our react app. The app does the following: It gets the movie data from an tmdb api. 
-
-## index.html (here we have the bulk of our React code)
-
-#### >  MovieInfo()
-This is a functional component responsible for rendering individual movie cards. It takes movie-related information as props and displays it along with buttons to indicate whether the user liked or disliked the movie.
-#### >  App()
-This is the main functional component that represents the entire application. It manages state variables, handles user interactions like swiping, and fetches movie data from the server. It also includes a set of helper functions like handleLikedClick, handleDislikedClick, moveToNextMovie, and handleImageError.
-#### >  fetchMovies()
-This function is responsible for fetching movie data from the server. It includes logic to filter out movies that the user has already seen and ensures that there are enough movies to display.
-#### >  sendSwipeDataToServer()
-This function sends data about the user's swipes (like, dislike) to the server for storage.
-#### >  handleSwipeStyles()
-This function calculates styles for the swipe animation, including card rotation and opacity based on the user's swipe.
-#### >  handleMove(), handleStart(), handleEnd()
-These functions handle user interactions with the swipe cards, including touch and mouse events. They determine whether a swipe is meaningful and trigger actions accordingly.
-#### >  throttle()
-This function is a utility for throttling the execution of a function so it doesn't run too frequently.
-
-## Wheel.js
-
-#### >  loadWheelImages()
-Preloads images for the wheel based on the provided movie data. Calls the callback function when all images are loaded.
-#### >  drawWheel()
-Draws the wheel with movies on the canvas, considering the specified rotation angle.
-#### >  drawIndicator()
-Draws a static indicator on the canvas.
-#### >  drawCenterButton()
-Draws a static center button on the canvas with a "Spin" label.
-#### >  calculateWinner()
-Determines and logs the winning movie based on the final wheel angle.
-#### >  spinWheel()
-Initiates the spinning of the wheel, updating the rotation angle and calculating the winning movie when the spinning stops.
-#### >  drawCenterButton() 
-Draws a static center button on the canvas with a "Spin" label.
-#### >  drawIndicator()
-Draws a static indicator on the canvas.
-#### >  window.onload
-Sets up the initial configuration when the window is fully loaded. Retrieves the canvas element, parses movie data, and calls `loadWheelImages` and `drawWheel` to preload images and draw the initial wheel, respectively.
+    * This file first check if the user is logged in and if not the user is presented with a login form and a link to the registration form. After it is confirmed that the user is authenticated and the domcontent is loaded we initiate our react app. The app does the following: It gets the movie data from an tmdb api with selected ganres (on first load ) 
