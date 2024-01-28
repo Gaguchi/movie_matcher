@@ -50,12 +50,63 @@ These are the main files that we use to make our app work. Some are relatively s
     * handles the urls for our app for simple page displays and api requests
 * Templates
   * **index.html**
-    * This file first check if the user is logged in and if not the user is presented with a login form and a link to the registration form. After it is confirmed that the user is authenticated and the domcontent is loaded we initiate our react app. The app does the following: It gets the movie data from an tmdb api with selected ganres in descending order of popularity. The page also loads a filter menu with the ganres that the user can choose (the ganres and the ganre code were taken from the tmbd api manual), [there used to de a selector for the order (acending or decending order of popularity rating etc but it didn;t work as well as i intended so i removed it. The reason for the removal was that it took a movie to get rated only a few times with positive reviews for it to shoot up to the number one spot in ratings and i felt that a movie needed more ratings to be proven as a high quality movie. Also i didn;t make sense to me why anyone would want to look for least popular movies either.) so the 'sortOption' just defaults to descending popular and i left it at that.]. Lets take a closer look at the movie cards that we render; They are meant to resenble the cards from apps like tinder for a more intuative experiense and so that the users instinctively understand that they have to swipe to show interest in the movie (the ```
-					<div class="dzSwipe_card__option dzReject">
-						<i class="fa-solid fa-xmark"></i>
-					</div>
-					<div class="dzSwipe_card__option dzLike">
-						<i class="fa-solid fa-check"></i>
-					</div>``` are meant to also tell the user which side to swipe since depending on the direction a red x mard or a green check mark will appear) and the seen liked and disliked buttons in case the user has already seen the movie. In an earlier draft i had overviews of the movies that were all different legths and some too long so i at first trunchated them with ```                const truncatedOverview = movie && movie.overview && movie.overview.length > 150 
-                    ? `${movie.overview.substring(0, 150)}...` 
-                    : movie && movie.overview || '';``` but the overviews still didn't look quite right so i decided to just add a page for each movie with full overview instead.
+    * This file first check if the user is logged in and if not the user is presented with a login form and a link to the registration form. After it is confirmed that the user is authenticated and the domcontent is loaded we initiate our react app. The app does the following: It gets the movie data from an tmdb api with selected ganres in descending order of popularity. The page also loads a filter menu with the ganres that the user can choose (the ganres and the ganre code were taken from the tmbd api manual), [there used to de a selector for the order (acending or decending order of popularity rating etc but it didn;t work as well as i intended so i removed it. The reason for the removal was that it took a movie to get rated only a few times with positive reviews for it to shoot up to the number one spot in ratings and i felt that a movie needed more ratings to be proven as a high quality movie. Also i didn;t make sense to me why anyone would want to look for least popular movies either.) so the 'sortOption' just defaults to descending popular and i left it at that.]. Lets take a closer look at the movie cards that we render; They are meant to resenble the cards from apps like tinder for a more intuative experiense and so that the users instinctively understand that they have to swipe to show interest in the movie (the 
+      ```
+      <div class="dzSwipe_card__option dzReject">
+        <i class="fa-solid fa-xmark"></i>
+      </div>
+      <div class="dzSwipe_card__option dzLike">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      ``` 
+	    are meant to also tell the user which side to swipe since depending on the direction a red x mard or a green check mark will appear) and the seen liked and disliked buttons in case the user has already seen the movie. In an earlier draft i had overviews of the movies that were all different legths and some too long so i at first trunchated them with
+	    ```
+	      const truncatedOverview = movie && movie.overview && movie.overview.length > 150 
+	      ? `${movie.overview.substring(0, 150)}...` 
+	      : movie && movie.overview || '';
+		```
+	    but the overviews still didn't look quite right so i decided to just add a page for each movie with full overview instead. At first I set the swipe distance (the minimum distance that the user needs to trigger in order for the swipe to be accepted) to be calculated from the middle of the pagebut this caused an issue where a user coudnt swipe left, for example, when they begun from the right side of the screen because the swipe right would automatically trigger when the user begun further than 200px to the right (200px was our trigger point), so instead i set the start of the swipe to the x coordinate of the mouse when the swiping motion is initiated 
+	      ```
+	        const initialX = e.clientX || e.touches[0].clientX;
+	        setStartX(initialX);
+	      ```.
+	The swiping function also handles quality of life features like the red X and the green checkmark as well as othe miscelenious animations (like returning the card smoothily back if the trigger of 200 px wasnt reached. I used to jump back before we added 
+		```                    
+		if (!isSwiping && !isMeaningfulSwipe) {
+		return { 
+		    cardStyle: { transition: 'transform 0.3s ease-out' }, 
+		    likeStyle: { opacity: 0 },
+		    rejectStyle: { opacity: 0 }
+		};
+		}
+		```
+
+  * **wheel_of_movies.html**
+    * This page is responsible for displaying the wheel of movies. Since the majority of the script is located inside the wheel.js file ill talk about wheel_of_movies.html briefly. It contains a canvas, a modal and hidden json what we get from the view to operate as well as standard react code for our app (like sendMovieData() that updates the movie data for the user), some functions that i used to help me draw and adjust the wheel so it looks correct (i used boolean inputs to adjust angles and rotations, which then are applied to help with calculating the winner). I'll write in more detail below when discussing wheel.js file.
+      
+  * **plinko.html**
+    * This page is similar in its structure to the wheel_of_movies.html in the way that the main bulk of code is located in the corresponsponding plinko.js file.
+* JavaScript files
+  * **wheel.js**
+    * The variables in the beginning of the code (for example the image scale and image position variables) were tied to range type inputs for the debugging purposes and to play around with the placement and the size of the images for the best visual effect. The other important variable is the angleoffset that helps with calculating the winning movie, if for example we want to change the position where the winning movie lands from the top of the wheel to the left or to the right this would be the varibale we will change to update the winner calculation.
+    * The loadWheelImages populates the ```var wheelImages = [];``` by accessing the movie data (the data is first sent by our view, which then is saved into ```<div id="movies-data" style="display:none;">{{ interested_movies_json|safe }}</div>```, that on load is sent to the loadWheelimages, if the movieWheelCanvas has been loaded of course through this function
+      ```
+		window.onload = function () {
+		var canvasElement = document.getElementById("movieWheelCanvas");
+		if (canvasElement) {
+		var moviesDataElement = document.getElementById("movies-data");
+		if (moviesDataElement) {
+		    var moviesData = JSON.parse(moviesDataElement.textContent);
+		    loadWheelImages(moviesData, function () {
+			drawWheel(canvasElement, 0)
+		    })
+		} else console.error("Movies data element not found")
+		} else console.error("Canvas element not found")
+		};
+  		```
+      The drawWheel draws the wheel on a canves at a given angle (sent to it from the function above ```drawWheel(canvasElement, 0)```), it calculates the number of sections (max 8) and the angle by diving the circle (2π) by the number of sections. This makes sure that all the sections are always the same size as each other. For each image and the section is calculates its position and size on the wheel based on the roatation angle and the number of sections and applies styling (some of which i duplicated for the button in the middle and the indicator to give all the elements similar feel), at first i had sections in different colours but then i decided to repeat two color and assigning them based on is the index of the section is even or odd ```context.fillStyle = index % 2 == 0 ? "#eeeeee" : "#dbdbdb";```.
+    * Draw drawIndicator and function drawCenterButton draw simple elements with similar styling to the wheel to make it easer for the user to see which movie they landed on and where they need to click to spin the wheel (even though anywhere on the wheel is clickable for the spin).
+    * Heres how calculateWinner function works: first it normalizes the rotationAngle to a value between 0 and 360 degrees. If the rotationAngle is negative, it adds 360 to it to make it positive. It then calculates an adjustedAngle by adding the normalizedAngle, the adjustedAngleOffset, and half of the angle of each section of the wheel (the adjustedAngle variable had to be added to manually fix an issue with the wrong movie sometimes being selected). The result is then normalized to a value between 0 and 360 degrees.The winningIndex is then calculated by multiplying the number of images by (1 - adjustedAngle / 360). This gives the index of the winning movie in the movieData array.If the winningIndex is valid (i.e., it is greater than or equal to 0 and less than the length of the movieData array), it retrieves the winning movie from the movieData array and logs its title to the console (this was used for debugging purposes and can be removed later). It then updates the winningMovieData global variable with the winning movie. It them gets the modal, updates the fields and displays it.
+    * The spinWheel function works like this: At the start, it checks if the wheel is spinning by checking the isSpinning variable and if it is then the function won't run (this is to prevent the spin from being initiated while the wheel is already spinning) and it checks is the movie data has been loaded, and if it hasn't it will not run. It then rotates the wheel completely at least 5 times (it looked better to me that way) and updates the wheelRotationAngle global variable with the final rotation angle modulo 360. This gives a value between 0 and 360 degrees.It sets a spinInterval that gradually increases the current rotation angle of the wheel and redraws the wheel at the new angle. The current rotation angle is increased by 10% of the difference between the final rotation angle and the current rotation angle.If the difference between the final rotation angle and the current rotation angle is less than 0.5, it clears the spinInterval, sets isSpinning to false to indicate that the wheel has stopped spinning, and calls the calculateWinner function to calculate the winning movie
+ 
+      
