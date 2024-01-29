@@ -7,83 +7,170 @@ var winningMovieData = null;
 
 var wheelImages = [];
 
-function loadWheelImages(e, t) {
-    var a = 0;
-    e.forEach(function (n, o) {
-        var i = new Image;
-        i.onload = function () {
-            a++, a === e.length && t()
-        }, i.src = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + n.fields.poster_path, wheelImages.push({
-            image: i,
-            movie: n
-        })
-    }), console.log(e)
+function loadWheelImages(movieData, callback) {
+    var loadedImagesCount = 0;
+    movieData.forEach(function (movie, index) {
+        var newImage = new Image;
+        newImage.onload = function () {
+            loadedImagesCount++;
+            if (loadedImagesCount === movieData.length) {
+                callback();
+            }
+        };
+        newImage.src = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + movie.fields.poster_path;
+        wheelImages.push({
+            image: newImage,
+            movie: movie
+        });
+    });
+    console.log(movieData);
 }
 
-function drawWheel(e, t) {
-    var a = e.getContext("2d"),
-        n = Math.min(wheelImages.length, 8),
-        o = t * Math.PI / 180,
-        i = 2 * Math.PI / n,
-        l = e.width / 2 - 20,
-        r = 20;
-    a.clearRect(0, 0, e.width, e.height), wheelImages.forEach(function (t, n) {
-        var h = o + n * i,
-            d = h + i;
-        a.beginPath(), a.arc(e.width / 2, e.height / 2, l, h, d, !1), a.arc(e.width / 2, e.height / 2, r, d, h, !0), a.closePath(), a.fillStyle = n % 2 == 0 ? "#eeeeee" : "#dbdbdb", a.shadowColor = "rgba(0, 0, 0, 0.5)", a.shadowBlur = 3, a.shadowOffsetX = 2, a.shadowOffsetY = 1, a.fill(), a.save(), a.beginPath(), a.arc(e.width / 2, e.height / 2, l, h, d, !1), a.arc(e.width / 2, e.height / 2, r, d, h, !0), a.closePath(), a.clip();
-        var s = Math.min((l - r) / t.image.width, (l - r) / t.image.height);
-        s *= imageScale;
-        var g = s * t.image.width,
-            f = s * t.image.height,
-            w = e.width / 2 + Math.cos(h + i / 2) * (r + imagePosition),
-            c = e.height / 2 + Math.sin(h + i / 2) * (r + imagePosition);
-        a.translate(w, c), a.rotate(h + i / 2 + Math.PI / 2), a.drawImage(t.image, -g / 2, -f / 2, g, f), a.restore()
-    }), drawCenterButton(e), drawIndicator(e)
+function drawWheel(canvas, rotationAngle) {
+    var context = canvas.getContext("2d"),
+        numImages = Math.min(wheelImages.length, 8),
+        radianAngle = rotationAngle * Math.PI / 180,
+        sectionAngle = 2 * Math.PI / numImages,
+        outerRadius = canvas.width / 2 - 20,
+        innerRadius = 20;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    wheelImages.forEach(function (wheelImage, index) {
+        var startAngle = radianAngle + index * sectionAngle,
+            endAngle = startAngle + sectionAngle;
+        context.beginPath();
+        context.arc(canvas.width / 2, canvas.height / 2, outerRadius, startAngle, endAngle, false);
+        context.arc(canvas.width / 2, canvas.height / 2, innerRadius, endAngle, startAngle, true);
+        context.closePath();
+        context.fillStyle = index % 2 == 0 ? "#eeeeee" : "#dbdbdb";
+        context.shadowColor = "rgba(0, 0, 0, 0.5)";
+        context.shadowBlur = 3;
+        context.shadowOffsetX = 2;
+        context.shadowOffsetY = 1;
+        context.fill();
+        context.save();
+        context.beginPath();
+        context.arc(canvas.width / 2, canvas.height / 2, outerRadius, startAngle, endAngle, false);
+        context.arc(canvas.width / 2, canvas.height / 2, innerRadius, endAngle, startAngle, true);
+        context.closePath();
+        context.clip();
+        var scale = Math.min((outerRadius - innerRadius) / wheelImage.image.width, (outerRadius - innerRadius) / wheelImage.image.height);
+        scale *= imageScale;
+        var imageWidth = scale * wheelImage.image.width,
+            imageHeight = scale * wheelImage.image.height,
+            imageX = canvas.width / 2 + Math.cos(startAngle + sectionAngle / 2) * (innerRadius + imagePosition),
+            imageY = canvas.height / 2 + Math.sin(startAngle + sectionAngle / 2) * (innerRadius + imagePosition);
+        context.translate(imageX, imageY);
+        context.rotate(startAngle + sectionAngle / 2 + Math.PI / 2);
+        context.drawImage(wheelImage.image, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight);
+        context.restore();
+    });
+    drawCenterButton(canvas);
+    drawIndicator(canvas);
 }
 
-function drawIndicator(e) {
-    var t = e.getContext("2d");
-    t.shadowColor = "rgba(0, 0, 0, 0.5)", t.shadowBlur = 3, t.shadowOffsetX = 2, t.shadowOffsetY = 1, t.fillStyle = "#dab694", t.beginPath(), t.moveTo(e.width / 2 - 20, 5), t.lineTo(e.width / 2 + 20, 5), t.lineTo(e.width / 2, 40), t.closePath(), t.fill(), t.shadowColor = "transparent", t.shadowBlur = 0, t.shadowOffsetX = 0, t.shadowOffsetY = 0
+function drawIndicator(canvas) {
+    var context = canvas.getContext("2d");
+    context.shadowColor = "rgba(0, 0, 0, 0.5)";
+    context.shadowBlur = 3;
+    context.shadowOffsetX = 2;
+    context.shadowOffsetY = 1;
+    context.fillStyle = "#dab694";
+    context.beginPath();
+    context.moveTo(canvas.width / 2 - 20, 5);
+    context.lineTo(canvas.width / 2 + 20, 5);
+    context.lineTo(canvas.width / 2, 40);
+    context.closePath();
+    context.fill();
+    context.shadowColor = "transparent";
+    context.shadowBlur = 0;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
 }
 
-function drawCenterButton(e) {
-    var t = e.getContext("2d");
-    t.fillStyle = "white", t.shadowColor = "rgba(0, 0, 0, 0.5)", t.shadowBlur = 3, t.shadowOffsetX = 2, t.shadowOffsetY = 1, t.beginPath(), t.arc(e.width / 2, e.height / 2, 30, 0, 2 * Math.PI, !1), t.fill(), t.fillStyle = "#dab694", t.beginPath(), t.arc(e.width / 2, e.height / 2, 25, 0, 2 * Math.PI, !1), t.fill(), t.fillStyle = "white", t.font = "bold 20px sans-serif", t.fillText("Spin", e.width / 2 - t.measureText("Spin").width / 2, e.height / 2 + 6)
+function drawCenterButton(canvas) {
+    var context = canvas.getContext("2d");
+    context.fillStyle = "white";
+    context.shadowColor = "rgba(0, 0, 0, 0.5)";
+    context.shadowBlur = 3;
+    context.shadowOffsetX = 2;
+    context.shadowOffsetY = 1;
+    context.beginPath();
+    context.arc(canvas.width / 2, canvas.height / 2, 30, 0, 2 * Math.PI, false);
+    context.fill();
+    context.fillStyle = "#dab694";
+    context.beginPath();
+    context.arc(canvas.width / 2, canvas.height / 2, 25, 0, 2 * Math.PI, false);
+    context.fill();
+    context.fillStyle = "white";
+    context.font = "bold 20px sans-serif";
+    context.fillText("Spin", canvas.width / 2 - context.measureText("Spin").width / 2, canvas.height / 2 + 6);
 }
 
-function calculateWinner(e, t, a) {
-    var n = e % 360;
-    n < 0 && (n += 360);
-    var o = (n + adjustedAngleOffset + 360 / t / 2) % 360;
-    o < 0 && (o += 360);
-    var i = Math.floor(t * (1 - o / 360));
-    if (i >= 0 && i < a.length) {
-        var l = a[i];
-        console.log("Winning Movie:", l.fields.title), winningMovieData = l;
-        var r = document.getElementById("exampleModalCenter");
-        let e = r.querySelector(".movie-link");
-        e ? (e.textContent = l.fields.title, e.href = "../movie_profile/" + l.fields.movie_id + "/") : console.error("Error: .movie-link element not found"), r.querySelector(".lead").textContent = l.fields.overview, r.querySelector(".text-muted").textContent = l.fields.release_date, r.querySelector(".modal-image").src = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + l.fields.poster_path, r.querySelector(".modal-content").style.background = "url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces" + l.fields.backdrop_path + ")";
-        var h = new bootstrap.Modal(r);
-        h.show()
-    } else console.error("Invalid Winning Index:", i)
-}
+function calculateWinner(rotationAngle, numImages, movieData) {
+    var normalizedAngle = rotationAngle % 360;
+    if (normalizedAngle < 0) {
+        normalizedAngle += 360;
+    }
 
-function spinWheel(e) {
-    if (!isSpinning) {
-        isSpinning = !0;
-        var t = document.getElementById("movies-data");
-        if (t) {
-            var a = JSON.parse(t.textContent),
-                n = Math.min(a.length, 8),
-                o = wheelRotationAngle + 360 * Math.random() + 1800;
-            wheelRotationAngle = o % 360;
-            var i = wheelRotationAngle,
-                l = setInterval(function () {
-                    i += .1 * (o - i), drawWheel(e, i), Math.abs(o - i) < .5 && (clearInterval(l), isSpinning = !1, calculateWinner(i, n, a))
-                }, 16)
-        } else console.error("Movies data element not found")
+    var adjustedAngle = (normalizedAngle + adjustedAngleOffset + 360 / numImages / 2) % 360;
+    if (adjustedAngle < 0) {
+        adjustedAngle += 360;
+    }
+
+    var winningIndex = Math.floor(numImages * (1 - adjustedAngle / 360));
+
+    if (winningIndex >= 0 && winningIndex < movieData.length) {
+        var winningMovie = movieData[winningIndex];
+        console.log("Winning Movie:", winningMovie.fields.title);
+        winningMovieData = winningMovie;
+
+        var modalElement = document.getElementById("exampleModalCenter");
+        let movieLinkElement = modalElement.querySelector(".movie-link");
+
+        if (movieLinkElement) {
+            movieLinkElement.textContent = winningMovie.fields.title;
+            movieLinkElement.href = "../movie_profile/" + winningMovie.fields.movie_id + "/";
+        } else {
+            console.error("Error: .movie-link element not found");
+        }
+
+        modalElement.querySelector(".lead").textContent = winningMovie.fields.overview;
+        modalElement.querySelector(".text-muted").textContent = winningMovie.fields.release_date;
+        modalElement.querySelector(".modal-image").src = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + winningMovie.fields.poster_path;
+        modalElement.querySelector(".modal-content").style.background = "url(https://image.tmdb.org/t/p/w1920_and_h800_multi_faces" + winningMovie.fields.backdrop_path + ")";
+
+        var modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    } else {
+        console.error("Invalid Winning Index:", winningIndex);
     }
 }
+
+function spinWheel(canvas) {
+    if (!isSpinning) {
+        isSpinning = true;
+        var moviesDataElement = document.getElementById("movies-data");
+        if (moviesDataElement) {
+            var moviesData = JSON.parse(moviesDataElement.textContent),
+                numImages = Math.min(moviesData.length, 8),
+                finalRotationAngle = wheelRotationAngle + 360 * Math.random() + 1800;
+            wheelRotationAngle = finalRotationAngle % 360;
+            var currentRotationAngle = wheelRotationAngle,
+                spinInterval = setInterval(function () {
+                    currentRotationAngle += 0.1 * (finalRotationAngle - currentRotationAngle);
+                    drawWheel(canvas, currentRotationAngle);
+                    if (Math.abs(finalRotationAngle - currentRotationAngle) < 0.5) {
+                        clearInterval(spinInterval);
+                        isSpinning = false;
+                        calculateWinner(currentRotationAngle, numImages, moviesData);
+                    }
+                }, 16);
+        } else {
+            console.error("Movies data element not found");
+        }
+    }
+}
+
 var imageScale = .9,
     imagePosition = 105,
     wheelRotationAngle = 0,
@@ -92,13 +179,13 @@ var imageScale = .9,
     winningMovieData = null,
     wheelImages = [];
 window.onload = function () {
-    var e = document.getElementById("movieWheelCanvas");
-    if (e) {
-        var t = document.getElementById("movies-data");
-        if (t) {
-            var a = JSON.parse(t.textContent);
-            loadWheelImages(a, function () {
-                drawWheel(e, 0)
+    var canvasElement = document.getElementById("movieWheelCanvas");
+    if (canvasElement) {
+        var moviesDataElement = document.getElementById("movies-data");
+        if (moviesDataElement) {
+            var moviesData = JSON.parse(moviesDataElement.textContent);
+            loadWheelImages(moviesData, function () {
+                drawWheel(canvasElement, 0)
             })
         } else console.error("Movies data element not found")
     } else console.error("Canvas element not found")

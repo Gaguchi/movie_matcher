@@ -17,7 +17,6 @@
 <!-- Page Content End -->
 
 <!-- Sliders -->
-
 <script src="{% static 'movie_match/assets/js/plinko.js' %}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -40,110 +39,107 @@
             plinko.addBall(x, y);
         });
 
-        
-    // Function to send movie data to the server
-    function sendMovieData(movie, liked) {
-        console.log('Sending movie data:', movie, 'Liked:', liked);  // Log the movie data and liked status
+        // Function to send movie data to the server
+        function sendMovieData(movie, liked) {
+            console.log('Sending movie data:', movie, 'Liked:', liked);
 
-        // Return the fetch promise
-        return fetch(`/movie_match/save_movie_data/${movie.fields.movie_id}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                seenLiked: liked,
-                seenDisliked: !liked,
-                movieId: movie.fields.movie_id,
-                title: movie.fields.title,
-                overview: movie.fields.overview,
-                release_date: movie.fields.release_date,
-                popularity: movie.fields.popularity,
-                vote_average: movie.fields.vote_average,
-                original_language: movie.fields.original_language,
-                original_title: movie.fields.original_title,
-                genre_ids: movie.fields.genre_ids,
-                backdrop_path: movie.fields.backdrop_path,
-                poster_path: movie.fields.poster_path,
-                video: movie.fields.video,
-                vote_count: movie.fields.vote_count,
-                adult: movie.fields.adult
-                // Add any other properties you wish to send
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .catch(error => {
-            console.error('Error sending movie data:', error);
-        });
-    }
-
-
-    // Function to handle Like and Dislike button clicks
-    function handleLikeDislikeClick(liked) {
-        console.log('Like/Dislike button clicked:', liked ? 'Liked' : 'Disliked');
-
-        if (winningMovieData) {
-            console.log('Selected movie for action:', winningMovieData);
-            sendMovieData(winningMovieData, liked)
-                .then(data => {
-                    console.log('Response from server:', data);
-
-                    // Parse the updated movie data
-                    var updatedMovies = JSON.parse(data.updated_movies);
-
-                    // Reinitialize the Plinko instance with the updated movie data
-                    plinko = new Plinko(canvas, updatedMovies);
-                    plinko.loop();
-
-                    closeModal();
+            return fetch(`/movie_match/save_movie_data/${movie.fields.movie_id}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    seenLiked: liked,
+                    seenDisliked: !liked,
+                    movieId: movie.fields.movie_id,
+                    title: movie.fields.title,
+                    overview: movie.fields.overview,
+                    release_date: movie.fields.release_date,
+                    popularity: movie.fields.popularity,
+                    vote_average: movie.fields.vote_average,
+                    original_language: movie.fields.original_language,
+                    original_title: movie.fields.original_title,
+                    genre_ids: movie.fields.genre_ids,
+                    backdrop_path: movie.fields.backdrop_path,
+                    poster_path: movie.fields.poster_path,
+                    video: movie.fields.video,
+                    vote_count: movie.fields.vote_count,
+                    adult: movie.fields.adult
+                    // Add any other properties you wish to send
                 })
-                .catch(err => console.error('Error:', err));
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error sending movie data:', error);
+            });
+        }
+
+        // Function to handle Like and Dislike button clicks
+        function handleLikeDislikeClick(liked) {
+            console.log('Like/Dislike button clicked:', liked ? 'Liked' : 'Disliked');
+
+            if (winningMovieData) {
+                console.log('Selected movie for action:', winningMovieData);
+                sendMovieData(winningMovieData, liked)
+                    .then(data => {
+                        console.log('Response from server:', data);
+
+                        // Parse the updated movie data
+                        var updatedMovies = JSON.parse(data.updated_movies);
+
+                        // Reinitialize the Plinko instance with the updated movie data
+                        plinko = new Plinko(canvas, updatedMovies);
+                        plinko.loop();
+
+                        closeModal();
+                    })
+                    .catch(err => console.error('Error:', err));
+            } else {
+                console.log('No movie selected');
+            }
+        }
+
+        // Function to update movies data and redraw the wheel
+        function updateMoviesData(updatedMoviesJson) {
+            var moviesElement = document.getElementById('movies-data');
+            if (moviesElement) {
+                moviesElement.textContent = updatedMoviesJson;
+                var updatedMovies = JSON.parse(updatedMoviesJson);
+
+                // Call redrawSections with the updated movie data
+                plinko.redrawSections(updatedMovies);
+            }
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            $('#exampleModalCenter').modal('hide'); // Using jQuery to hide the modal
+        }
+
+        const likedButton = document.querySelector('.Liked');
+        const dislikedButton = document.querySelector('.Disliked');
+
+        if (likedButton && dislikedButton) {
+            likedButton.addEventListener('click', function() {
+                handleLikeDislikeClick(true);
+            });
+
+            dislikedButton.addEventListener('click', function() {
+                handleLikeDislikeClick(false);
+            });
+
+            console.log('Event listeners attached to buttons');
         } else {
-            console.log('No movie selected');
+            console.log('Like/Dislike buttons not found');
         }
-    }
-
-
-    // Function to update movies data and redraw the wheel
-    function updateMoviesData(updatedMoviesJson) {
-        var moviesElement = document.getElementById('movies-data');
-        if (moviesElement) {
-            moviesElement.textContent = updatedMoviesJson;
-            var updatedMovies = JSON.parse(updatedMoviesJson);
-
-            // Call redrawSections with the updated movie data
-            plinko.redrawSections(updatedMovies);
-        }
-    }
-
-    // Function to close the modal
-    function closeModal() {
-        $('#exampleModalCenter').modal('hide'); // Using jQuery to hide the modal
-    }
-
-    const likedButton = document.querySelector('.Liked');
-    const dislikedButton = document.querySelector('.Disliked');
-
-    if (likedButton && dislikedButton) {
-        likedButton.addEventListener('click', function() {
-            handleLikeDislikeClick(true);
-        });
-
-        dislikedButton.addEventListener('click', function() {
-            handleLikeDislikeClick(false);
-        });
-
-        console.log('Event listeners attached to buttons');  // Log that event listeners are attached
-    } else {
-        console.log('Like/Dislike buttons not found');  // Log if buttons are not found
-    }
     });
 </script>
+
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
