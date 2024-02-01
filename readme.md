@@ -112,6 +112,29 @@ These are the main files that we use to make our app work. Some are relatively s
     * To understand how the plinko game works we have to understand how the ball element works and how it interacts with the pegs and behaves in, what I believe, a realistic manner. The main parameters for us are the gravity, friction and bounciness of the balls. Gravity and friction are handled by the ```update``` method and the bounciness by the ```bounce``` method. So lets look at all the methods of the ball class individually:
       * constructor creates the object and sets the gravity, friction, bounciness and other variables for the object. It is a fairly straightforward method the only thing i would note about it is that it used to take ```yCoordinate``` but i found plinko to work much better if we have a constant y, so that the ball is always generated at the top but the user can still choose the x-axis.
       * update method is responsible for updating the state of the ball at each frame. We first apply gravity to the vertical velocity of the object (that we set to 0 in the constructor) using this line ```this.vy += this.gravity;``` this is to simulate the ball accelerating downwards. And working in the opposite direction we of course have friction, that we use to reduce the horizontal and vertical velocities, with these lines ```this.vx *= this.friction;``` and ```this.vy *= this.friction;```. Once the velocities have been set we update the positions x and y of our ball using these lines: ```this.x += this.vx;``` and ```this.y += this.vy;```. And when the ball hits the bottom of our canvas the if statement makes sure to set the vertical velocity to -1 making sure the ball doesn't move (i had an issue where the ball would phase through the canvas once it hit the bottom and this if statement fixed that issue).
-      * bounce method it triggered when the ball collides with a peg (inside the update method of the plinko class) we use the Pythagorean theorem to determine determine it a collision has occured. We do it like this: we calculate the differnce in the x and y coordinates between the ball and the peg and use these lines ```const dx = ball.x - peg.x;``` and ```const dy = ball.y - peg.y;``` to get the vector from the ball to the peg. We use those vectors and the Pythagorean theorem to determine the distance between the ball and the peg through this line ```const distance = Math.sqrt(dx * dx + dy * dy);``` and this lines ```if (distance < ball.radius + peg.radius) {``` checks if the collision has occured by checking if the distance between the centers of the ball and the peg is less than the sum of their radii, and if it is then a collision has occurred. 
-      * 
+      * bounce method it triggered when the ball collides with a peg (inside the update method of the plinko class) we use the Pythagorean theorem to determine determine it a collision has occured. We do it like this: we calculate the differnce in the x and y coordinates between the ball and the peg and use these lines ```const dx = ball.x - peg.x;``` and ```const dy = ball.y - peg.y;``` to get the vector from the ball to the peg. We use those vectors and the Pythagorean theorem to determine the distance between the ball and the peg through these lines
+        ```
+		const dx = ball.x - peg.x;
+		const dy = ball.y - peg.y;
+		const distance = Math.sqrt(dx * dx + dy * dy);
+  		```
+	  	 and this lines ```if (distance < ball.radius + peg.radius) {``` checks if the collision has occured by checking if the distance between the centers of the ball and the peg is less than the sum of their radii, and if it is then a collision has occurred. And if the collision has ocued this batch of code is triggered
+        ```
+			const angle = Math.atan2(dy, dx);
+			const sinAngle = Math.sin(angle);
+			const cosAngle = Math.cos(angle);
+			let vx = ball.vx * cosAngle + ball.vy * sinAngle;
+			let vy = ball.vy * cosAngle - ball.vx * sinAngle;
+			vx *= -1;
+			ball.vx = vx * cosAngle - vy * sinAngle;
+			ball.vy = vy * cosAngle + vx * sinAngle;
+			ball.bounce();
+			const overlap = ball.radius + peg.radius - distance;
+			ball.x += overlap * cosAngle;
+			ball.y += overlap * sinAngle;
+  		```
+		Heres and explananion of this code: First we use static javascript method ```Math.atan2()``` to get an angle (in radians) between the positive x-axis and the point (dx,dy).Then these lines: ```const sinAngle = Math.sin(angle);``` and const ```cosAngle = Math.cos(angle);``` calculate the sine and cosine of the angle. These values are used to rotate the velocity of the ball. After the sine and cosine valus have been determined we use then to rotate the velocity of the ball using these lines ```let vx = ball.vx * cosAngle + ball.vy * sinAngle;``` and ```let vy = ball.vy * cosAngle - ball.vx * sinAngle;``` and invert the x component of the velocity ti naje the ball bounce off the peg using this line ```vx *= -1;``` - This line inverts the x component of the velocity to make the ball bounce off the peg. Afterwards we rotate the velocity back to the original coordinate system and call the bouce method with the newly set vx and vy. ```const overlap = ball.radius + peg.radius - distance;``` calculates how much the ball and the peg are overlapping and ```ball.x += overlap * cosAngle;``` and ```ball.y += overlap * sinAngle;```lines move the ball out of the peg so they're no longer overlapping.
+      		
+# Conclusion
+In conclusion, this readme highlights the distinctiveness and complexity of the Movie Matcher project. The integration of Django and React ensures a straightforward user experience, allowing easy interaction with movie cards and practical decision-making. The addition of features like the "Wheel of Movies" and Plinko-style game brings an element of fun to the app, making it more than just a movie recommendation tool.
       
